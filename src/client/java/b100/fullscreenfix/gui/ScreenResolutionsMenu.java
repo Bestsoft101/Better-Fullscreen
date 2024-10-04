@@ -33,6 +33,7 @@ public class ScreenResolutionsMenu extends GuiScrollListScreen {
 		doneButton = add(new GuiButton(this, FullscreenFix.translate("button.done")).addActionListener((e) -> {
 			FullscreenFix.setFullscreenVideoMode(selectedVideoMode);
 			FullscreenFix.setFullscreen(true);
+			FullscreenFix.saveConfig();
 			back();	
 		}));
 	}

@@ -52,5 +52,29 @@ public class GLFWUtil {
 		}
 		return null;
 	}
+	
+	public static long findMonitor(int x, int y, int width, int height) {
+		for(long monitor : getMonitors()) {
+			MonitorInfo monitorInfo = new MonitorInfo(monitor);
+			if(monitorInfo.posX == x
+					&& monitorInfo.posY == y
+					&& monitorInfo.width == width
+					&& monitorInfo.height == height) {
+				return monitor;
+			}
+		}
+		return 0;
+	}
+	
+	public static GLFWVidMode getMonitorVidMode(long monitor, int width, int height, int refreshRate) {
+		for(GLFWVidMode vidMode : getVideoModes(monitor)) {
+			if(vidMode.width() == width
+					&& vidMode.height() == height
+					&& vidMode.refreshRate() == refreshRate) {
+				return vidMode;
+			}
+		}
+		return null;
+	}
 
 }

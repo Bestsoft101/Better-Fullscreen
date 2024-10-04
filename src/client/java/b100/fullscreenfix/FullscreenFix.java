@@ -120,6 +120,9 @@ public class FullscreenFix {
 		str.append("borderlessFullscreen:" + borderlessFullscreen + "\n");
 		str.append("fullscreenOptimizations:" + fullscreenOptimizations + "\n");
 		str.append("autoMinimize:" + autoMinimize + "\n");
+		if(fullscreenVideoMode != null) {
+			str.append("fullscreenMode:" + fullscreenVideoMode.toConfigString() + "\n");	
+		}
 		
 		ConfigUtil.saveStringToFile(str.toString(), configFile);
 	}
@@ -133,6 +136,8 @@ public class FullscreenFix {
 			fullscreenOptimizations = value.equalsIgnoreCase("true");
 		}else if(key.equals("autoMinimize")) {
 			autoMinimize = value.equalsIgnoreCase("true");
+		}else if(key.equals("fullscreenMode")) {
+			fullscreenVideoMode = VideoMode.parse(value);
 		}
 	}
 	
@@ -152,8 +157,6 @@ public class FullscreenFix {
 		translations.clear();
 		String language = languageManager.getLanguage();
 		
-		print("Language: " + language);
-
 		if(!language.equals("en_us")) {
 			loadLanguage("en_us");
 		}
@@ -163,8 +166,6 @@ public class FullscreenFix {
 	}
 	
 	private static void loadLanguage(String name) {
-		print("Load Language: " + name);
-		
 		String path = "lang/" + name + ".lang";
 		Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.of(MODID, path));
 		if(!resource.isPresent()) {
