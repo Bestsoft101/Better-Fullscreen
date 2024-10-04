@@ -1,0 +1,20 @@
+button.cancel=Cancel
+button.saveAndQuit=Save and Quit
+button.done=Done
+
+option.enableMod=Enable Mod (Requires Restart)
+option.fullscreen=Fullscreen
+option.borderlessFullscreen=Borderless Fullscreen
+option.windowsFullscreenOptimizations=Windows Fullscreen Optimizations
+option.windowsFullscreenOptimizations.tooltip=Fullscreen Optimizations is a feature added in Windows 10 which helps increase performance and reduce input lag when playing games in fullscreen. It can cause issues issues with screen capture software. To disable Fullscreen Optimizations, Borderless Fullscreen must be enabled.
+option.autoMinimize=Minimize on lost focus
+option.autoMinimize.tooltip=Borderless Fullscreen must be disabled
+option.fullscreenResolution=Fullscreen Resolution
+option.fullscreenResolution.tooltip=Using a custom Fullscreen Resolution will disable Borderless Fullscreen
+
+value.fullscreenResolution.default=Default
+value.yes=Yes
+value.no=No
+
+screen.fullscreenSettings.title=Fullscreen Settings
+screen.fullscreenResolution.title=Fullscreen Resolution

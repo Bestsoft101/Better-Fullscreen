@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "b100.fullscreenfix.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"access.IScreen",
+		"access.WindowAccess",
+		"LanguageManagerMixin",
+		"WindowMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "fullscreenfix",
+	"version": "${version}",
+	"name": "Borderless Fullscreen",
+	"description": "Borderless Fullscreen",
+	"authors": [
+		"Me!"
+	],
+	"environment": "client",
+	"entrypoints": {
+		"modmenu": [
+			"b100.fullscreenfix.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		{
+			"config": "fullscreenfix.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.2",
+		"java": ">=21"
+	}
+}
