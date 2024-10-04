@@ -7,6 +7,18 @@
 	"authors": [
 		"Me!"
 	],
+	"contact": {
+		"homepage": "https://github.com/Bestsoft101/Better-Fullscreen",
+		"sources": "https://github.com/Bestsoft101/Better-Fullscreen",
+		"issues": "https://github.com/Bestsoft101/Better-Fullscreen/issues"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.modrinth": "https://modrinth.com/project/borderless-fullscreen"
+			}
+		}
+	},
 	"environment": "client",
 	"entrypoints": {
 		"modmenu": [
