@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.text.Text;
 
 public class ScreenWrapper extends Screen {
 
@@ -84,6 +85,11 @@ public class ScreenWrapper extends Screen {
 	@Override
 	public void onDisplayed() {
 		screenOpened = true;
+	}
+	
+	@Override
+	public Text getTitle() {
+		return Text.of("");
 	}
 	
 }
