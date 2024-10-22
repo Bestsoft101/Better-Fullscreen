@@ -32,9 +32,9 @@ public class GuiScrollableList extends GuiContainer {
 		
 		final int separatorSize = 2;
 		
-		utils.drawContext.drawTexture(textures.menuListBackground, 0, this.posY + separatorSize, 0, 0, this.width, this.height - 2 * separatorSize, 32, 32);
-		utils.drawContext.drawTexture(textures.headerSeparator, 0, this.posY, 0, 0, this.width, separatorSize, 32, separatorSize);
-		utils.drawContext.drawTexture(textures.footerSeparator, 0, this.posY + this.height - separatorSize, 0, 0, this.width, 2, 32, separatorSize);
+		utils.drawContext.drawTexture(utils.getRenderLayer, textures.menuListBackground, 0, this.posY + separatorSize, 0, 0, this.width, this.height - 2 * separatorSize, 32, 32);
+		utils.drawContext.drawTexture(utils.getRenderLayer, textures.headerSeparator, 0, this.posY, 0, 0, this.width, separatorSize, 32, separatorSize);
+		utils.drawContext.drawTexture(utils.getRenderLayer, textures.footerSeparator, 0, this.posY + this.height - separatorSize, 0, 0, this.width, 2, 32, separatorSize);
 		
 		utils.drawContext.enableScissor(this.posX, this.posY + separatorSize, this.width, this.posY + this.height - separatorSize);
 		super.draw();

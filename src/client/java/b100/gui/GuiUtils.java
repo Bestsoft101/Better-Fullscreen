@@ -1,5 +1,7 @@
 package b100.gui;
 
+import java.util.function.Function;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import b100.fullscreenfix.mixin.access.IScreen;
@@ -7,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
@@ -19,6 +22,8 @@ public class GuiUtils {
 	
 	public DrawContext drawContext;
 	public TextRenderer textRenderer;
+	
+	public Function<Identifier, RenderLayer> getRenderLayer = (id) -> RenderLayer.getGuiTextured(id);
 	
 	private GuiUtils() {
 		
@@ -52,7 +57,7 @@ public class GuiUtils {
 	}
 	
 	public void drawGuiTexture(Identifier texture, int x, int y, int width, int height) {
-		drawContext.drawGuiTexture(texture, x, y, width, height);
+		drawContext.drawGuiTexture(getRenderLayer, texture, x, y, width, height);
 	}
 	
 	public void drawRectangle(int x, int y, int w, int h, int color) {
