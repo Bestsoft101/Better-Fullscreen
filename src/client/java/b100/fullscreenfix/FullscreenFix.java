@@ -6,8 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import b100.fullscreenfix.mixin.access.WindowAccess;
 import b100.fullscreenfix.util.ConfigUtil;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.util.Window;
@@ -16,8 +20,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class FullscreenFix {
-	
+
+	public static final boolean INDEV = FabricLoader.getInstance().isDevelopmentEnvironment();
 	public static final String MODID = "fullscreenfix";
+	private static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 	public static final boolean OS_WINDOWS = isWindows();
 	
 	private static Window window;
@@ -219,8 +225,12 @@ public class FullscreenFix {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
 	}
 	
-	public static void print(String str) {
-		System.out.print("[FullscreenFix] " + str + "\n");
+	public static void print(String string) {
+		if(INDEV) {
+			System.out.print("[FullscreenFix] " + string + "\n");
+		}else {
+			LOGGER.info("[FullscreenFix] " + string);	
+		}
 	}
 
 }
