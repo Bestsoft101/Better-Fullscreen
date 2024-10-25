@@ -127,6 +127,9 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 
 	@Override
 	public void focusChanged(Focusable focusable) {
+		if(!focusable.isFocused()) {
+			return;
+		}
 		GuiElement element = (GuiElement) focusable;
 		if(contains(element)) {
 			lastFocusedElement = focusable;

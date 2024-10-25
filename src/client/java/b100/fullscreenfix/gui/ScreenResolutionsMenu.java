@@ -102,6 +102,11 @@ public class ScreenResolutionsMenu extends GuiScrollListScreen {
 			
 			utils.drawCenteredString(text, posX + width / 2, posY + height / 2 - 4, 0xFFFFFF, true);
 		}
+		
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "[x=" + posX + ",y=" + posY + ",w=" + width + ",h=" + height + ",text=" + (text != null ? text.getString() : null) + "]";
+		}
 	}
 
 }
