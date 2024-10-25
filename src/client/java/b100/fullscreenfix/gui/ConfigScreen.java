@@ -42,7 +42,7 @@ public class ConfigScreen extends GuiScrollListScreen {
 	
 	@Override
 	public void initScrollElements() {
-		scrollList.add(new BooleanToggleElement(this, "option.enableMod", FullscreenFix.isModEnabled()).addSaveConsumer(newValue -> FullscreenFix.setModEnabled(newValue)));
+		scrollList.add(new BooleanToggleElement(this, "option.enableMod", FullscreenFix.isModEnabledNextLaunch()).addSaveConsumer(newValue -> FullscreenFix.setModEnabled(newValue)));
 		
 		if(FullscreenFix.isModEnabled()) {
 			scrollList.add(new BooleanToggleElement(this, "option.fullscreen", FullscreenFix.isFullscreenEnabled()).addSaveConsumer(newValue -> FullscreenFix.setFullscreen(newValue)));
@@ -77,7 +77,9 @@ public class ConfigScreen extends GuiScrollListScreen {
 	
 	@Override
 	public void onScreenOpened() {
-		fullscreenResolutionButton.setValue(FullscreenFix.getFullscreenVideoMode());
+		if(fullscreenResolutionButton != null) {
+			fullscreenResolutionButton.setValue(FullscreenFix.getFullscreenVideoMode());
+		}
 		super.onScreenOpened();
 	}
 }

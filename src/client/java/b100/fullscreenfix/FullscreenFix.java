@@ -29,7 +29,9 @@ public class FullscreenFix {
 	
 	public static boolean windowNeedsUpdate = false;
 	
-	private static boolean enableMod = true;
+	private static final boolean enableMod;
+	
+	private static boolean enableModNextLaunch = true;
 	private static boolean borderlessFullscreen = true;
 	private static boolean fullscreenOptimizations = true;
 	private static boolean autoMinimize = false;
@@ -43,14 +45,20 @@ public class FullscreenFix {
 	
 	static {
 		loadConfig();
+		
+		enableMod = enableModNextLaunch;
 	}
 	
 	public static boolean isModEnabled() {
 		return enableMod;
 	}
 	
+	public static boolean isModEnabledNextLaunch() {
+		return enableModNextLaunch;
+	}
+	
 	public static void setModEnabled(boolean value) {
-		enableMod = value;
+		enableModNextLaunch = value;
 	}
 	
 	public static boolean isBorderlessEnabled() {
@@ -76,6 +84,9 @@ public class FullscreenFix {
 	}
 	
 	public static boolean isFullscreenEnabled() {
+		if(window == null) {
+			return false;
+		}
 		return window.isFullscreen();
 	}
 	
@@ -116,7 +127,7 @@ public class FullscreenFix {
 	
 	public static void saveConfig() {
 		StringBuilder str = new StringBuilder();
-		str.append("enableMod:" + enableMod + "\n");
+		str.append("enableMod:" + enableModNextLaunch + "\n");
 		str.append("borderlessFullscreen:" + borderlessFullscreen + "\n");
 		str.append("fullscreenOptimizations:" + fullscreenOptimizations + "\n");
 		str.append("autoMinimize:" + autoMinimize + "\n");
@@ -129,7 +140,7 @@ public class FullscreenFix {
 
 	public static void parse(String key, String value) {
 		if(key.equals("enableMod")) {
-			enableMod = value.equalsIgnoreCase("true");
+			enableModNextLaunch = value.equalsIgnoreCase("true");
 		}else if(key.equals("borderlessFullscreen")) {
 			borderlessFullscreen = value.equalsIgnoreCase("true");
 		}else if(key.equals("fullscreenOptimizations")) {
