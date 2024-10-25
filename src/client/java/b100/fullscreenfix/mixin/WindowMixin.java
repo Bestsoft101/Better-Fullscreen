@@ -38,6 +38,8 @@ public abstract class WindowMixin {
 	private int windowWidth;
 	private int windowHeight;
 	
+	private boolean firstUpdate = true;
+	
 	@Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwWindowHint(II)V", ordinal = 0))
 	private void onSetupWindowHints(CallbackInfo info) {
 		if(!FullscreenFix.isModEnabled()) {
@@ -111,6 +113,15 @@ public abstract class WindowMixin {
 	}
 	
 	private void updateWindowState() {
+		if(firstUpdate) {
+			firstUpdate = false;
+			
+			if(!FullscreenFix.isStartInFullscreenEnabled()) {
+				FullscreenFix.print("Start in fullscreen is disabled, turning off fullscreen");
+				fullscreen = false;
+			}
+		}
+		
 		if(fullscreenModeHasChanged) {
 			fullscreenModeHasChanged = false;
 			if(newFullscreenMode == null) {

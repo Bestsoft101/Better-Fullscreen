@@ -41,6 +41,7 @@ public class FullscreenFix {
 	private static boolean borderlessFullscreen = true;
 	private static boolean fullscreenOptimizations = true;
 	private static boolean autoMinimize = false;
+	private static boolean startInFullscreen = true;
 	
 	/**
 	 * May be null for current resolution
@@ -123,6 +124,14 @@ public class FullscreenFix {
 		}
 	}
 	
+	public static boolean isStartInFullscreenEnabled() {
+		return startInFullscreen;
+	}
+	
+	public static void setStartInFullscreen(boolean value) {
+		startInFullscreen = value;
+	}
+	
 	public static void updateWindow() {
 		windowNeedsUpdate = true;
 	}
@@ -137,6 +146,7 @@ public class FullscreenFix {
 		str.append("borderlessFullscreen:" + borderlessFullscreen + "\n");
 		str.append("fullscreenOptimizations:" + fullscreenOptimizations + "\n");
 		str.append("autoMinimize:" + autoMinimize + "\n");
+		str.append("startInFullscreen:" + startInFullscreen + "\n");
 		if(fullscreenVideoMode != null) {
 			str.append("fullscreenMode:" + fullscreenVideoMode.toConfigString() + "\n");	
 		}
@@ -153,6 +163,8 @@ public class FullscreenFix {
 			fullscreenOptimizations = value.equalsIgnoreCase("true");
 		}else if(key.equals("autoMinimize")) {
 			autoMinimize = value.equalsIgnoreCase("true");
+		}else if(key.equals("startInFullscreen")) {
+			startInFullscreen = value.equalsIgnoreCase("true");
 		}else if(key.equals("fullscreenMode")) {
 			fullscreenVideoMode = VideoMode.parse(value);
 		}

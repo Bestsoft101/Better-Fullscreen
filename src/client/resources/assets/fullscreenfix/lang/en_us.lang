@@ -11,6 +11,8 @@ option.autoMinimize=Minimize on lost focus
 option.autoMinimize.tooltip=Borderless Fullscreen must be disabled
 option.fullscreenResolution=Fullscreen Resolution
 option.fullscreenResolution.tooltip=Using a custom Fullscreen Resolution will disable Borderless Fullscreen
+option.startInFullscreen=Start in Fullscreen
+option.startInFullscreen.tooltip=When disabled, the game will always start in windowed mode
 
 value.fullscreenResolution.default=Default
 value.yes=Yes

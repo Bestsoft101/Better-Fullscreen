@@ -53,6 +53,7 @@ public class ConfigScreen extends GuiScrollListScreen {
 			}
 			
 			scrollList.add(new BooleanToggleElement(this, "option.autoMinimize", FullscreenFix.isAutoMinimizeEnabled()).addSaveConsumer(newValue -> FullscreenFix.setAutoMinimize(newValue)));
+			scrollList.add(new BooleanToggleElement(this, "option.startInFullscreen", FullscreenFix.isStartInFullscreenEnabled()).addSaveConsumer(newValue -> FullscreenFix.setStartInFullscreen(newValue)));
 			
 			fullscreenResolutionButton = scrollList.add(new CustomOptionElement<>(this, "option.fullscreenResolution", FullscreenFix.getFullscreenVideoMode())
 			.addActionListener((e) -> utils.setScreen(new ScreenResolutionsMenu(this)))

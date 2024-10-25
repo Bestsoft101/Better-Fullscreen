@@ -11,6 +11,8 @@ option.autoMinimize=Minimieren bei Fokusverlust
 option.autoMinimize.tooltip=Diese Option funktioniert nur wenn der randlose Vollbildmodus deaktiviert ist.
 option.fullscreenResolution=Vollbildauflösung
 option.fullscreenResolution.tooltip=Wenn man eine eigene Vollbildauflösung benutzt wird der randlose Vollbildmodus deaktiviert.
+option.startInFullscreen=Im Vollbildmodus starten
+option.startInFullscreen.tooltip=Wenn deaktiviert startet das Spiel nicht im Vollbildmodus.
 
 value.fullscreenResolution.default=Standard
 value.yes=Ja
