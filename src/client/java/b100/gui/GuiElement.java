@@ -11,6 +11,8 @@ public abstract class GuiElement {
 	
 	public abstract void draw();
 	
+	private GuiContainer container;
+	
 	public boolean keyEvent(int key, int scancode, int modifiers, boolean pressed) {
 		return false;
 	}
@@ -45,6 +47,21 @@ public abstract class GuiElement {
 	
 	public boolean isSolid() {
 		return true;
+	}
+	
+	public void onAddedToContainer(GuiContainer container) {
+		if(this.container != null) {
+			throw new RuntimeException("Cannot add element " + this + "to container " + container + " because element is already added to container " + this.container + "!");
+		}
+		this.container = container;
+	}
+	
+	public void onRemovedFromContainer(GuiContainer container) {
+		this.container = null;
+	}
+
+	public GuiContainer getContainer() {
+		return container;
 	}
 	
 	@Override

@@ -139,5 +139,10 @@ public class GuiButton extends GuiElement implements Focusable {
 	public boolean isFocusable() {
 		return clickable;
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[x=" + posX + ",y=" + posY + ",w=" + width + ",h=" + height + ",text=" + (text != null ? text.getString() : null) + "]";
+	}
 
 }

@@ -21,8 +21,9 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	 * Only one element per screen should be focused
 	 */
 	protected Focusable focusedElement;
-	
+
 	private final List<ScreenListener> screenListeners = new ArrayList<>();
+	private final List<FocusListener> focusListeners = new ArrayList<>();
 	
 	private ScreenWrapper wrapper;
 	
@@ -76,6 +77,34 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 			return true;
 		}
 		
+		if(pressed) {
+			FocusDirection focusDirection = FocusDirection.get(key, modifiers);
+			if(focusDirection != null) {
+				if(focusNextElement(focusDirection)) {
+					return true;
+				}
+			}	
+		}
+		
+		return false;
+	}
+	
+	public boolean focusNextElement(FocusDirection direction) {
+		Focusable next;
+		if(focusedElement != null) {
+			next = Focusable.findNextFocusableElement((GuiElement) focusedElement, direction);
+			
+			if(next == null && direction.isTab()) {
+				// Loop around
+				next = getFirstFocusableElement(direction);
+			}
+		}else {
+			next = getFirstFocusableElement(direction);
+		}
+		if(next != null) {
+			next.setFocused(true);
+			return true;
+		}
 		return false;
 	}
 	
@@ -112,6 +141,7 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 			}
 			this.focusedElement = focusable;
 		}
+		focusListeners.forEach((e) -> e.focusChanged(focusable));
 	}
 	
 	public GuiElement getMouseOver() {
@@ -147,6 +177,15 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	
 	public boolean removeScreenListener(ScreenListener screenListener) {
 		return screenListeners.remove(screenListener);
+	}
+	
+	public GuiElement addFocusListener(FocusListener focusListener) {
+		focusListeners.add(focusListener);
+		return this;
+	}
+	
+	public boolean removeFocusListener(FocusListener focusListener) {
+		return focusListeners.remove(focusListener);
 	}
 	
 	public void setTooltip(Text tooltip) {

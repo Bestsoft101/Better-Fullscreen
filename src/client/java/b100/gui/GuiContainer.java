@@ -1,13 +1,17 @@
 package b100.gui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GuiContainer extends GuiElement {
 	
-	public final List<GuiElement> elements = new ArrayList<>();
+	private final List<GuiElement> elementsMutable = new ArrayList<>();
+	public final List<GuiElement> elements = Collections.unmodifiableList(elementsMutable);
 
 	private final List<ContainerListener> containerListeners = new ArrayList<>();
+	
+	protected boolean isList = false;
 	
 	@Override
 	public void draw() {
@@ -55,11 +59,23 @@ public class GuiContainer extends GuiElement {
 	}
 	
 	public <E extends GuiElement> E add(E element) {
-		elements.add(element);
+		if(element == null) {
+			throw new NullPointerException("Added element is null!");
+		}
+		elementsMutable.add(element);
+		element.onAddedToContainer(this);
 		for(ContainerListener containerListener : containerListeners) {
 			containerListener.elementAdded(this, element);
 		}
 		return element;
+	}
+	
+	public boolean remove(GuiElement element) {
+		if(elementsMutable.remove(element)) {
+			element.onRemovedFromContainer(this);
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean contains(GuiElement element) {
@@ -95,6 +111,67 @@ public class GuiContainer extends GuiElement {
 		return null;
 	}
 	
+	/**
+	 * Get the first focusable element in this container
+	 * <br> Containers in different shapes should override this method
+	 * <br> If there is no focusable element, null is returned
+	 */
+	public Focusable getFirstFocusableElement(FocusDirection direction) {
+		int start, dir;
+		boolean backwards;
+		if(direction.isListNavigation()) {
+			backwards = direction.isForwards();
+		}else {
+			backwards = !direction.isForwards();
+		}
+		if(!backwards) {
+			start = 0;
+			dir = 1;
+		}else {
+			start = elements.size() - 1;
+			dir = -1;
+		}
+		return getNextFocusable(start, dir, direction);
+	}
+	
+	/**
+	 * Search for the next focusable element in this container, starting at the given element.
+	 * <br> Containers in different shapes should override this method
+	 * <br> If there is no next focusable element, null is returned
+	 */
+	public Focusable getNextFocusable(GuiElement element, FocusDirection direction) {
+		if(isList && direction.isTab()) {
+			// Next container
+			return null;
+		}
+		if(direction.isListNavigation()) {
+			return getFirstFocusableElement(direction);
+		}
+		int start = elements.indexOf(element);
+		if(start == -1) {
+			return getFirstFocusableElement(direction);
+		}
+		int dir = direction.isForwards() ? 1 : -1;
+		return getNextFocusable(start + dir, dir, direction);
+	}
+	
+	protected final Focusable getNextFocusable(int start, int dir, FocusDirection direction) {
+		for(int i = start; i >= 0 && i < elements.size(); i += dir) {
+			GuiElement element = elements.get(i);
+			if(element instanceof GuiContainer) {
+				GuiContainer container = (GuiContainer) element;
+				Focusable focusable = container.getFirstFocusableElement(direction);
+				if(focusable != null) {
+					return focusable;
+				}
+			}
+			if(Focusable.isFocusable(element)) {
+				return (Focusable) element;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public boolean isSolid() {
 		return false;
@@ -107,6 +184,11 @@ public class GuiContainer extends GuiElement {
 	
 	public boolean removeContainerListener(ContainerListener containerListener) {
 		return containerListeners.remove(containerListener);
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[x=" + posX + ",y=" + posY + ",w=" + width + ",h=" + height + ",elements=" + elements.size() + "]";
 	}
 
 }

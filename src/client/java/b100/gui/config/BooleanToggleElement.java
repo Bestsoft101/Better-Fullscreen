@@ -47,7 +47,7 @@ public class BooleanToggleElement extends GuiContainer implements ActionListener
 	@Override
 	public void draw() {
 		GuiElement mouseOver = button.screen.getMouseOver();
-		if(mouseOver == this || contains(mouseOver)) {
+		if(mouseOver == this || contains(mouseOver) || button.isFocused()) {
 			utils.drawRectangle(posX, posY, width, height, 0x20FFFFFF);
 			
 			if(tooltipText != null) {
