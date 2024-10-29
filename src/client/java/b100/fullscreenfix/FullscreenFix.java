@@ -43,7 +43,8 @@ public class FullscreenFix {
 	private static File configFolder = Paths.get("config").toFile();
 	private static File configFile = new File(configFolder, MODID + ".properties");
 	
-	public static boolean windowNeedsUpdate = false;
+	public static boolean windowNeedsUpdate = true;
+	public static boolean fullscreenModeWasChanged = false;
 	
 	private static final boolean enableMod;
 	
@@ -118,6 +119,11 @@ public class FullscreenFix {
 	public static void setFullscreen(boolean value) {
 		WindowAccess access = (WindowAccess)(Object)window;
 		access.setFullscreen(value);
+
+		SimpleOption<Boolean> fullscreenOption = getVanillaFullscreenOption();
+		if(fullscreenOption != null) {
+			fullscreenOption.setValue(value);
+		}
 	}
 	
 	public static VideoMode getFullscreenVideoMode() {
@@ -169,8 +175,6 @@ public class FullscreenFix {
 	}
 	
 	////////////////////////////////////
-	
-	public static boolean fullscreenModeWasChanged = false;
 	
 	private static SimpleOption<Integer> createFullscreenOption() {
 		return new SimpleOption<Integer>("fullscreenoverride",
@@ -238,6 +242,15 @@ public class FullscreenFix {
 		fullscreenModeWasChanged = true;
 	}
 	
+	@SuppressWarnings("resource")
+	public static SimpleOption<Boolean> getVanillaFullscreenOption() {
+		try {
+			return MinecraftClient.getInstance().options.getFullscreen();	
+		}catch (NullPointerException e) {
+			return null;
+		}
+	}
+	
 	////////////////////////////////////
 	
 	public static void loadConfig() {
@@ -254,6 +267,7 @@ public class FullscreenFix {
 		if(fullscreenVideoMode != null) {
 			str.append("fullscreenMode:" + fullscreenVideoMode.toConfigString() + "\n");	
 		}
+		str.append("replaceVideoSettingsButton:" + replaceVideoSettingsButton + "\n");
 		
 		ConfigUtil.saveStringToFile(str.toString(), configFile);
 	}
@@ -271,6 +285,8 @@ public class FullscreenFix {
 			startInFullscreen = value.equalsIgnoreCase("true");
 		}else if(key.equals("fullscreenMode")) {
 			fullscreenVideoMode = VideoMode.parse(value);
+		}else if(key.equals("replaceVideoSettingsButton")) {
+			replaceVideoSettingsButton = value.equalsIgnoreCase("true");
 		}
 	}
 	
@@ -339,6 +355,12 @@ public class FullscreenFix {
 	
 	private static boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");
+	}
+	
+	public static void debugPrint(String string) {
+		if(INDEV) {
+			System.out.print("[FullscreenFixDebug] " + string + "\n");
+		}
 	}
 	
 	public static void print(String string) {

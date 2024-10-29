@@ -46,6 +46,9 @@ public abstract class WindowMixin {
 			return;
 		}
 		
+		FullscreenFix.debugPrint("Setup Window Hints");
+		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
+		
 		glfwWindowHint(GLFW_AUTO_ICONIFY, 1);
 		glfwWindowHint(GLFW_RESIZABLE, 1);
 		glfwWindowHint(GLFW_DECORATED, 1);
@@ -58,6 +61,11 @@ public abstract class WindowMixin {
 			return;
 		}
 		
+		FullscreenFix.debugPrint("PostInit");
+		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
+		
+		FullscreenFix.setWindow((Window)(Object)this);
+		
 		// Center Window
 		int[] i = new int[1];
 		int[] j = new int[1];
@@ -65,16 +73,25 @@ public abstract class WindowMixin {
 		int width = i[0];
 		int height = j[0];
 		MonitorInfo monitor = new MonitorInfo(glfwGetPrimaryMonitor());
-		glfwSetWindowPos(getHandle(), (monitor.width - width) / 2, (monitor.height - height) / 2);
+		int x = (monitor.width - width) / 2;
+		int y = (monitor.height - height) / 2;
+		glfwSetWindowPos(getHandle(), x, y);
+		this.windowPosX = x;
+		this.windowPosY = y;
+		this.windowWidth = width;
+		this.windowHeight = height;
 		
 		glfwShowWindow(getHandle());
 		initialized = true;
 		
-		FullscreenFix.setWindow((Window)(Object)this);
 	}
 	
 	@Inject(method = "swapBuffers", at = @At(value = "TAIL"))
 	private void onSwapBuffers(CallbackInfo ci) {
+		if(!FullscreenFix.isModEnabled()) {
+			return;
+		}
+		
 		if(FullscreenFix.windowNeedsUpdate) {
 			FullscreenFix.windowNeedsUpdate = false;
 			updateWindowState();
@@ -86,9 +103,13 @@ public abstract class WindowMixin {
 		if(!FullscreenFix.isModEnabled()) {
 			return;
 		}
+
+		FullscreenFix.debugPrint("Update Window Region");
+		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
 		
 		ci.cancel();
 		if(!initialized) {
+			FullscreenFix.debugPrint("Not initialized!");
 			return;
 		}
 		
@@ -105,6 +126,8 @@ public abstract class WindowMixin {
 			glfwGetWindowSize(handle, i, j);
 			windowWidth = i[0];
 			windowHeight = j[0];
+			
+			FullscreenFix.debugPrint("Window Size: " + windowWidth + " x " + windowHeight + " at " + windowPosX + ", " + windowPosY);
 		}
 		
 		updateWindowState();
@@ -113,12 +136,15 @@ public abstract class WindowMixin {
 	}
 	
 	private void updateWindowState() {
+		FullscreenFix.debugPrint("Update Window State");
+		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
+		
 		if(firstUpdate) {
 			firstUpdate = false;
 			
-			if(!FullscreenFix.isStartInFullscreenEnabled()) {
+			if(FullscreenFix.isFullscreenEnabled() && !FullscreenFix.isStartInFullscreenEnabled()) {
 				FullscreenFix.print("Start in fullscreen is disabled, turning off fullscreen");
-				fullscreen = false;
+				FullscreenFix.setFullscreen(false);
 			}
 		}
 		

@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import b100.fullscreenfix.FullscreenFix;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.gui.screen.option.VideoOptionsScreen;
@@ -23,11 +22,10 @@ public abstract class VideoOptionsScreenMixin extends GameOptionsScreen {
 		super(parent, gameOptions, title);
 	}
 	
-	@SuppressWarnings("resource")
 	@ModifyArg(method = "addOptions", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/OptionListWidget;addAll([Lnet/minecraft/client/option/SimpleOption;)V"), index = 0)
 	private SimpleOption<?>[] replaceFullscreenOption(SimpleOption<?>[] options) {
-		if(FullscreenFix.shouldReplaceVideoSettingsButton()) {
-			SimpleOption<?> fullscreenOption = MinecraftClient.getInstance().options.getFullscreen();
+		if(FullscreenFix.isModEnabled() && FullscreenFix.shouldReplaceVideoSettingsButton()) {
+			SimpleOption<?> fullscreenOption = FullscreenFix.getVanillaFullscreenOption();
 			for(int i=0; i < options.length; i++) {
 				SimpleOption<?> option = options[i];
 				if(option == fullscreenOption) {
@@ -40,7 +38,7 @@ public abstract class VideoOptionsScreenMixin extends GameOptionsScreen {
 	
 	@Inject(method = "close", at = @At(value = "TAIL"))
 	private void onClose(CallbackInfo ci) {
-		if(FullscreenFix.fullscreenModeWasChanged) {
+		if(FullscreenFix.isModEnabled() && FullscreenFix.fullscreenModeWasChanged) {
 			FullscreenFix.print("Save Config");
 			FullscreenFix.saveConfig();
 			FullscreenFix.fullscreenModeWasChanged = false;
