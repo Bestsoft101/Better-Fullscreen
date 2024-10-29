@@ -51,7 +51,7 @@ public class FullscreenFix {
 	private static boolean enableModNextLaunch = true;
 	private static boolean borderlessFullscreen = true;
 	private static boolean fullscreenOptimizations = true;
-	private static boolean autoMinimize = false;
+	private static boolean autoMinimize = true;
 	private static boolean startInFullscreen = true;
 	private static boolean replaceVideoSettingsButton = true;
 	
@@ -185,8 +185,7 @@ public class FullscreenFix {
 					public Function<SimpleOption<Integer>, ClickableWidget> getWidgetCreator(TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
 						return option -> {
 							final ButtonWidget button = ButtonWidget.builder(getFullscreenModeDisplayText(), (pressedButton) -> {
-								int newMode = (getCurrentFullscreenModeInt() + 1) % 3;
-								setFullscreenMode(newMode);
+								setFullscreenMode(getCurrentFullscreenMode().next());
 								pressedButton.setMessage(getFullscreenModeDisplayText());
 							}).build();
 							return button;
@@ -205,12 +204,12 @@ public class FullscreenFix {
 	}
 	
 	private static Text getFullscreenModeDisplayText() {
-		int mode = getCurrentFullscreenModeInt();
+		FullscreenMode mode = getCurrentFullscreenMode();
 		StringBuilder str = new StringBuilder();
 		str.append(translateToString("option.fullscreen")).append(": ");
-		if(mode == 2) {
+		if(mode == FullscreenMode.BORDERLESS) {
 			str.append(translateToString("option.fullscreen.borderless"));
-		}else if(mode == 1) {
+		}else if(mode == FullscreenMode.ON) {
 			str.append(translateToString("option.fullscreen.on"));
 		}else {
 			str.append(translateToString("option.fullscreen.off"));
@@ -218,22 +217,22 @@ public class FullscreenFix {
 		return Text.of(str.toString());
 	}
 	
-	private static int getCurrentFullscreenModeInt() {
+	public static FullscreenMode getCurrentFullscreenMode() {
 		if(isFullscreenEnabled()) {
 			if(isBorderlessEnabled()) {
-				return 2;
+				return FullscreenMode.BORDERLESS;
 			}
-			return 1;
+			return FullscreenMode.ON;
 		}
-		return 0;
+		return FullscreenMode.OFF;
 	}
 	
-	private static void setFullscreenMode(int mode) {
-		if(mode == 0) {
+	public static void setFullscreenMode(FullscreenMode mode) {
+		if(mode == FullscreenMode.OFF) {
 			setFullscreen(false);
 		}else {
 			setFullscreen(true);
-			if(mode == 2) {
+			if(mode == FullscreenMode.BORDERLESS) {
 				setBorderless(true);
 			}else {
 				setBorderless(false);

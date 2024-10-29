@@ -16,8 +16,8 @@ option.fullscreenResolution=Fullscreen Resolution
 option.fullscreenResolution.tooltip=Using a custom Fullscreen Resolution will disable Borderless Fullscreen
 option.startInFullscreen=Start in Fullscreen
 option.startInFullscreen.tooltip=When disabled, the game will always start in windowed mode
-option.replaceVideoSettingsButton=Replace Fullscreen Button
-option.replaceVideoSettingsButton.tooltip=Changes the fullscreen button in the video settings menu to contain a borderless option
+option.replaceVideoSettings=Replace Fullscreen Button
+option.replaceVideoSettings.tooltip=Changes the fullscreen button in the video settings menu to contain a borderless option
 
 value.fullscreenResolution.default=Default
 value.yes=Yes

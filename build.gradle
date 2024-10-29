@@ -16,6 +16,12 @@ repositories {
 		name = "Terraformers"
 		url = "https://maven.terraformersmc.com/"
 	}
+	
+	// Sodium
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+	}
 }
 
 loom {
@@ -43,6 +49,11 @@ dependencies {
 	
 	// Mod Menu
 	modImplementation("com.terraformersmc:modmenu:12.0.0-beta.1")
+	
+	// Sodium
+    modImplementation("maven.modrinth:sodium:mc1.21-0.6.0-beta.2-fabric")
+    modImplementation("maven.modrinth:sodium-extra:mc1.21.1-0.6.0-beta.3+fabric")
+    modImplementation("maven.modrinth:reeses-sodium-options:mc1.21.1-1.8.0-beta.4+fabric")
 }
 
 processResources {

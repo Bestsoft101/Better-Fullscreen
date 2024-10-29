@@ -1,5 +1,6 @@
 package b100.fullscreenfix;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,8 +9,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import net.fabricmc.loader.api.FabricLoader;
+
 public class MixinPlugin implements IMixinConfigPlugin {
-	
+
 	public Set<String> mixinsThatRequireModEnabled = new HashSet<>();
 	
 	public MixinPlugin() {
@@ -42,7 +45,11 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		return null;
+		List<String> mixins = new ArrayList<>();
+		if(FabricLoader.getInstance().isModLoaded("sodium") && FullscreenFix.isModEnabled()) {
+			mixins.add("sodium.SodiumGameOptionPagesMixin");	
+		}
+		return mixins;
 	}
 
 	@Override
