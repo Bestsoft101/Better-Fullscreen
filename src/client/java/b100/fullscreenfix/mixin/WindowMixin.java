@@ -42,10 +42,6 @@ public abstract class WindowMixin {
 	
 	@Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwWindowHint(II)V", ordinal = 0))
 	private void onSetupWindowHints(CallbackInfo info) {
-		if(!FullscreenFix.isModEnabled()) {
-			return;
-		}
-		
 		FullscreenFix.debugPrint("Setup Window Hints");
 		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
 		
@@ -57,10 +53,6 @@ public abstract class WindowMixin {
 	
 	@Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lorg/lwjgl/glfw/GLFW;glfwSetFramebufferSizeCallback(JLorg/lwjgl/glfw/GLFWFramebufferSizeCallbackI;)Lorg/lwjgl/glfw/GLFWFramebufferSizeCallback;"))
 	private void postInit(CallbackInfo info) {
-		if(!FullscreenFix.isModEnabled()) {
-			return;
-		}
-		
 		FullscreenFix.debugPrint("PostInit");
 		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
 		
@@ -88,10 +80,6 @@ public abstract class WindowMixin {
 	
 	@Inject(method = "swapBuffers", at = @At(value = "TAIL"))
 	private void onSwapBuffers(CallbackInfo ci) {
-		if(!FullscreenFix.isModEnabled()) {
-			return;
-		}
-		
 		if(FullscreenFix.windowNeedsUpdate) {
 			FullscreenFix.windowNeedsUpdate = false;
 			updateWindowState();
@@ -100,10 +88,6 @@ public abstract class WindowMixin {
 	
 	@Inject(method = "updateWindowRegion", at = @At(value = "HEAD"), cancellable = true)
 	private void onUpdateWindowRegion(CallbackInfo ci) {
-		if(!FullscreenFix.isModEnabled()) {
-			return;
-		}
-
 		FullscreenFix.debugPrint("Update Window Region");
 		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
 		
@@ -224,9 +208,6 @@ public abstract class WindowMixin {
 	@Inject(method = "setFullscreenVideoMode", at = @At("HEAD"), cancellable = true)
 	private void onSetFullscreenVideoMode(Optional<net.minecraft.client.util.VideoMode> optional, CallbackInfo ci) {
 		FullscreenFix.print("Set Fullscreen Mode: " + optional);
-		if(!FullscreenFix.isModEnabled()) {
-			return;
-		}
 		
 		// This is called when the slider in the options menu is clicked.
 		// We don't want to update the resolution until the menu is closed

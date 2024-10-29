@@ -1,6 +1,7 @@
 {
 	"required": true,
 	"package": "b100.fullscreenfix.mixin",
+	"plugin": "b100.fullscreenfix.MixinPlugin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"access.IScreen",
