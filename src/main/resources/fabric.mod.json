@@ -21,6 +21,9 @@
 	},
 	"environment": "client",
 	"entrypoints": {
+		"client": [
+			"b100.fullscreenfix.FullscreenFixInit"
+		],
 		"modmenu": [
 			"b100.fullscreenfix.ModMenuIntegration"
 		]
@@ -31,6 +34,7 @@
 			"environment": "client"
 		}
 	],
+	"accessWidener": "fullscreenfix.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.16.2",
 		"minecraft": ">=1.21.2",

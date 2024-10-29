@@ -5,19 +5,29 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.mojang.serialization.Codec;
 
 import b100.fullscreenfix.mixin.access.WindowAccess;
 import b100.fullscreenfix.util.ConfigUtil;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.SimpleOption;
+import net.minecraft.client.option.SimpleOption.TooltipFactory;
 import net.minecraft.client.resource.language.LanguageManager;
 import net.minecraft.client.util.Window;
 import net.minecraft.resource.Resource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public class FullscreenFix {
 
@@ -42,6 +52,7 @@ public class FullscreenFix {
 	private static boolean fullscreenOptimizations = true;
 	private static boolean autoMinimize = false;
 	private static boolean startInFullscreen = true;
+	private static boolean replaceVideoSettingsButton = true;
 	
 	/**
 	 * May be null for current resolution
@@ -50,11 +61,18 @@ public class FullscreenFix {
 	
 	private static final Map<String, String> translations = new HashMap<>();
 	
+	/**
+	 * Custom option for the vanilla video settings menu
+	 */
+	public static SimpleOption<Integer> fullscreenOption = createFullscreenOption();
+	
 	static {
 		loadConfig();
 		
 		enableMod = enableModNextLaunch;
 	}
+	
+	////////////////////////////////////
 	
 	public static boolean isModEnabled() {
 		return enableMod;
@@ -132,9 +150,95 @@ public class FullscreenFix {
 		startInFullscreen = value;
 	}
 	
+	public static void setReplaceVideoSettingsButton(boolean value) {
+		replaceVideoSettingsButton = value;
+	}
+	
+	public static boolean shouldReplaceVideoSettingsButton() {
+		return replaceVideoSettingsButton;
+	}
+	
+	////////////////////////////////////
+	
 	public static void updateWindow() {
 		windowNeedsUpdate = true;
 	}
+	
+	public static void setWindow(Window window) {
+		FullscreenFix.window = window;
+	}
+	
+	////////////////////////////////////
+	
+	public static boolean fullscreenModeWasChanged = false;
+	
+	private static SimpleOption<Integer> createFullscreenOption() {
+		return new SimpleOption<Integer>("fullscreenoverride",
+				SimpleOption.emptyTooltip(),
+				(text, value) -> Text.of("idkwhatthisdoes"),
+				new SimpleOption.Callbacks<>() {
+					@Override
+					public Function<SimpleOption<Integer>, ClickableWidget> getWidgetCreator(TooltipFactory<Integer> tooltipFactory, GameOptions gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
+						return option -> {
+							final ButtonWidget button = ButtonWidget.builder(getFullscreenModeDisplayText(), (pressedButton) -> {
+								int newMode = (getCurrentFullscreenModeInt() + 1) % 3;
+								setFullscreenMode(newMode);
+								pressedButton.setMessage(getFullscreenModeDisplayText());
+							}).build();
+							return button;
+						};
+					}
+					@Override
+					public Optional<Integer> validate(Integer value) {
+						return Optional.of(MathHelper.clamp(value, 0, 2));
+					}
+					@Override
+					public Codec<Integer> codec() {
+						return Codec.INT;
+					}
+				}, 0, (newValue) -> {}
+		);
+	}
+	
+	private static Text getFullscreenModeDisplayText() {
+		int mode = getCurrentFullscreenModeInt();
+		StringBuilder str = new StringBuilder();
+		str.append(translateToString("option.fullscreen")).append(": ");
+		if(mode == 2) {
+			str.append(translateToString("option.fullscreen.borderless"));
+		}else if(mode == 1) {
+			str.append(translateToString("option.fullscreen.on"));
+		}else {
+			str.append(translateToString("option.fullscreen.off"));
+		}
+		return Text.of(str.toString());
+	}
+	
+	private static int getCurrentFullscreenModeInt() {
+		if(isFullscreenEnabled()) {
+			if(isBorderlessEnabled()) {
+				return 2;
+			}
+			return 1;
+		}
+		return 0;
+	}
+	
+	private static void setFullscreenMode(int mode) {
+		if(mode == 0) {
+			setFullscreen(false);
+		}else {
+			setFullscreen(true);
+			if(mode == 2) {
+				setBorderless(true);
+			}else {
+				setBorderless(false);
+			}
+		}
+		fullscreenModeWasChanged = true;
+	}
+	
+	////////////////////////////////////
 	
 	public static void loadConfig() {
 		ConfigUtil.loadConfig(configFile, (key, value) -> parse(key, value), ':');
@@ -170,9 +274,7 @@ public class FullscreenFix {
 		}
 	}
 	
-	public static void setWindow(Window window) {
-		FullscreenFix.window = window;
-	}
+	////////////////////////////////////
 	
 	public static void loadTranslations() {
 		print("Load Translations");
@@ -232,6 +334,8 @@ public class FullscreenFix {
 	public static boolean translationExists(String key) {
 		return translations.containsKey(key);
 	}
+	
+	////////////////////////////////////
 	
 	private static boolean isWindows() {
 		return System.getProperty("os.name").toLowerCase().contains("windows");

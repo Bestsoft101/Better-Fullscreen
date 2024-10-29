@@ -4,6 +4,9 @@ button.done=Fertig
 
 option.enableMod=Mod Aktivieren (Benötigt Neustart)
 option.fullscreen=Vollbild
+option.fullscreen.borderless=Randlos
+option.fullscreen.on=An
+option.fullscreen.off=Aus
 option.borderlessFullscreen=Randloser Vollbild
 option.windowsFullscreenOptimizations=Windows Vollbildoptimierungen
 option.windowsFullscreenOptimizations.tooltip=Vollbildoptimierungen ist ein Windows 10 Feature das im Vollbildmodus die Leistung verbessert und Eingabeverzögerung reduziert, Es kann jedoch Probleme mit Bildschirmaufnahmeprogrammen verursachen. Um Vollbildoptimierungen zu deaktivieren muss der randlose Vollbildmodus aktiviert sein.
@@ -13,6 +16,8 @@ option.fullscreenResolution=Vollbildauflösung
 option.fullscreenResolution.tooltip=Wenn man eine eigene Vollbildauflösung benutzt wird der randlose Vollbildmodus deaktiviert.
 option.startInFullscreen=Im Vollbildmodus starten
 option.startInFullscreen.tooltip=Wenn deaktiviert startet das Spiel nicht im Vollbildmodus.
+option.replaceVideoSettings=Vollbild-Knopf ersetzen
+option.replaceVideoSettings.tooltip=Ersetzt die Vollbild-Schaltfläche in den Grafikeinstellungen mit einer eigenen, die eine Randlos-Option enthält
 
 value.fullscreenResolution.default=Standard
 value.yes=Ja

@@ -6,6 +6,7 @@
 		"access.IScreen",
 		"access.WindowAccess",
 		"LanguageManagerMixin",
+		"VideoOptionsScreenMixin",
 		"WindowMixin"
 	],
 	"injectors": {
