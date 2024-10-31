@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GuiContainer extends GuiElement {
+public class GuiContainer extends GuiElement implements FocusListener {
 	
 	private final List<GuiElement> elementsMutable = new ArrayList<>();
 	public final List<GuiElement> elements = Collections.unmodifiableList(elementsMutable);
 
-	private final List<ContainerListener> containerListeners = new ArrayList<>();
+	public final ListenerList<ContainerListener> containerListeners = new ListenerList<>(this);
 	
 	protected boolean isList = false;
+	private Focusable lastFocusedElement = null;
 	
 	@Override
 	public void draw() {
@@ -64,9 +65,7 @@ public class GuiContainer extends GuiElement {
 		}
 		elementsMutable.add(element);
 		element.onAddedToContainer(this);
-		for(ContainerListener containerListener : containerListeners) {
-			containerListener.elementAdded(this, element);
-		}
+		containerListeners.forEach((e) -> e.elementAdded(this, element));
 		return element;
 	}
 	
@@ -92,6 +91,12 @@ public class GuiContainer extends GuiElement {
 			}
 		}
 		return false;
+	}
+	
+	public void removeAll() {
+		for(GuiElement element : new ArrayList<>(elements)) {
+			remove(element);
+		}
 	}
 	
 	public GuiElement getClickElementAt(double x, double y) {
@@ -177,13 +182,21 @@ public class GuiContainer extends GuiElement {
 		return false;
 	}
 	
-	public GuiContainer addContainerListener(ContainerListener containerListener) {
-		containerListeners.add(containerListener);
-		return this;
+	public Focusable getLastFocusedElement() {
+		if(!contains((GuiElement) lastFocusedElement)) {
+			lastFocusedElement = null;
+		}
+		return lastFocusedElement;
 	}
-	
-	public boolean removeContainerListener(ContainerListener containerListener) {
-		return containerListeners.remove(containerListener);
+
+	@Override
+	public void focusChanged(Focusable focusable) {
+		if(focusable.isFocused()) {
+			GuiElement element = (GuiElement) focusable;
+			if(contains(element)) {
+				lastFocusedElement = focusable;
+			}
+		}
 	}
 	
 	@Override

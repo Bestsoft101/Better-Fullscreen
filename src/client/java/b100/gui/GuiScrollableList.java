@@ -3,7 +3,7 @@ package b100.gui;
 import b100.gui.Textures.GuiTextures;
 import net.minecraft.util.math.MathHelper;
 
-public class GuiScrollableList extends GuiContainer implements FocusListener {
+public class GuiScrollableList extends GuiContainer {
 	
 	public GuiScreen screen;
 	public Layout layout;
@@ -15,14 +15,10 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 	
 	private boolean scrollAmountChanged = false;
 	
-	private Focusable lastFocusedElement = null;
-	
 	public GuiScrollableList(GuiScreen screen, Layout layout) {
 		this.screen = screen;
 		this.layout = layout;
 		this.isList = true;
-		
-		screen.addFocusListener(this);
 	}
 	
 	@Override
@@ -37,11 +33,11 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 		
 		final int separatorSize = 2;
 		
-		utils.drawContext.drawTexture(utils.getRenderLayer, textures.menuListBackground, 0, this.posY + separatorSize, 0, 0, this.width, this.height - 2 * separatorSize, 32, 32);
-		utils.drawContext.drawTexture(utils.getRenderLayer, textures.headerSeparator, 0, this.posY, 0, 0, this.width, separatorSize, 32, separatorSize);
-		utils.drawContext.drawTexture(utils.getRenderLayer, textures.footerSeparator, 0, this.posY + this.height - separatorSize, 0, 0, this.width, 2, 32, separatorSize);
+		utils.drawContext.drawTexture(utils.getRenderLayer, textures.menuListBackground, posX, posY + separatorSize, 0, 0, this.width, this.height - 2 * separatorSize, 32, 32);
+		utils.drawContext.drawTexture(utils.getRenderLayer, textures.headerSeparator, posX, posY, 0, 0, this.width, separatorSize, 32, separatorSize);
+		utils.drawContext.drawTexture(utils.getRenderLayer, textures.footerSeparator, posX, posY + this.height - separatorSize, 0, 0, this.width, 2, 32, separatorSize);
 		
-		utils.drawContext.enableScissor(this.posX, this.posY + separatorSize, this.width, this.posY + this.height - separatorSize);
+		utils.drawContext.enableScissor(posX, posY + separatorSize, posX + width, posY + height - separatorSize);
 		super.draw();
 		utils.drawContext.disableScissor();
 	}
@@ -59,7 +55,7 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 	
 	@Override
 	public boolean scrollEvent(double horizontalAmount, double verticalAmount, double mouseX, double mouseY) {
-		if(screen.isInside(mouseX, mouseY)) {
+		if(isInside(mouseX, mouseY)) {
 			scroll(verticalAmount * 16.0);
 			return true;
 		}
@@ -114,6 +110,7 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 	
 	@Override
 	public Focusable getFirstFocusableElement(FocusDirection direction) {
+		Focusable lastFocusedElement = getLastFocusedElement();
 		if(lastFocusedElement != null && direction.isTab()) {
 			return lastFocusedElement;
 		}
@@ -124,16 +121,21 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 	public Focusable getNextFocusable(GuiElement element, FocusDirection direction) {
 		return super.getNextFocusable(element, direction);
 	}
+	
+	public static interface Layout {
+		
+		public void moveElements(GuiScrollableList list);
+		
+		public int getContentHeight(GuiScrollableList list);
+		
+		public int getContentWidth(GuiScrollableList list);
+		
+	}
 
 	@Override
 	public void focusChanged(Focusable focusable) {
-		if(!focusable.isFocused()) {
-			return;
-		}
 		GuiElement element = (GuiElement) focusable;
-		if(contains(element)) {
-			lastFocusedElement = focusable;
-			
+		if(focusable.isFocused() && contains(element)) {
 			int offset = 0;
 			if(element.posY < posY) {
 				offset = posY - element.posY + 4;
@@ -145,16 +147,7 @@ public class GuiScrollableList extends GuiContainer implements FocusListener {
 				scroll(offset);
 			}
 		}
-	}
-	
-	public static interface Layout {
-		
-		public void moveElements(GuiScrollableList list);
-		
-		public int getContentHeight(GuiScrollableList list);
-		
-		public int getContentWidth(GuiScrollableList list);
-		
+		super.focusChanged(focusable);
 	}
 	
 	public static class ListLayout implements Layout {

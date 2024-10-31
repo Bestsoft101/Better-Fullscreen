@@ -1,8 +1,5 @@
 package b100.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.sound.SoundEvents;
@@ -31,8 +28,8 @@ public class GuiButton extends GuiElement implements Focusable {
 	 */
 	private boolean focused = false;
 	
-	private final List<ActionListener> actionListeners = new ArrayList<>();
-	private final List<FocusListener> focusListeners = new ArrayList<>();
+	public final ListenerList<ActionListener> actionListeners = new ListenerList<>(this);
+	public final ListenerList<FocusListener> focusListeners = new ListenerList<>(this);
 	
 	public GuiButton(GuiScreen screen, Text text) {
 		this.screen = screen;
@@ -87,9 +84,7 @@ public class GuiButton extends GuiElement implements Focusable {
 	
 	public void clickButton() {
 		utils.playSound(SoundEvents.UI_BUTTON_CLICK);
-		for(ActionListener actionListener : actionListeners) {
-			actionListener.actionPerformed(this);
-		}
+		actionListeners.forEach((listener) -> listener.actionPerformed(this));
 	}
 	
 	public void setClickable(boolean clickable) {
@@ -100,33 +95,11 @@ public class GuiButton extends GuiElement implements Focusable {
 		return clickable;
 	}
 	
-	public GuiButton addActionListener(ActionListener actionListener) {
-		actionListeners.add(actionListener);
-		return this;
-	}
-	
-	public boolean removeActionListener(ActionListener actionListener) {
-		return actionListeners.remove(actionListener);
-	}
-
-	@Override
-	public GuiButton addFocusListener(FocusListener actionListener) {
-		focusListeners.add(actionListener);
-		return this;
-	}
-
-	@Override
-	public boolean removeFocusListener(FocusListener actionListener) {
-		return focusListeners.remove(actionListener);
-	}
-	
 	@Override
 	public void setFocused(boolean focused) {
 		if(focused != this.focused) {
 			this.focused = focused;
-			for(FocusListener focusListener : focusListeners) {
-				focusListener.focusChanged(this);
-			}
+			focusListeners.forEach((listener) -> listener.focusChanged(this));
 		}
 	}
 
@@ -138,6 +111,24 @@ public class GuiButton extends GuiElement implements Focusable {
 	@Override
 	public boolean isFocusable() {
 		return clickable;
+	}
+
+	@Override
+	public ListenerList<FocusListener> getFocusListeners() {
+		return focusListeners;
+	}
+	
+	public ListenerList<ActionListener> getActionListeners() {
+		return actionListeners;
+	}
+	
+	public GuiButton addActionListener(ActionListener actionListener) {
+		actionListeners.add(actionListener);
+		return this;
+	}
+	
+	public boolean removeActionListener(ActionListener actionListener) {
+		return actionListeners.remove(actionListener);
 	}
 	
 	@Override

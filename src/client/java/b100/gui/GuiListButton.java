@@ -1,7 +1,6 @@
 package b100.gui;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraft.text.Text;
 
 public class GuiListButton extends GuiElement implements Focusable {
 	
@@ -9,10 +8,13 @@ public class GuiListButton extends GuiElement implements Focusable {
 	
 	private boolean focused = false;
 	
-	private final List<FocusListener> focusListeners = new ArrayList<>();
+	private final ListenerList<FocusListener> focusListeners = new ListenerList<>(this);
 	
+	public int outlineColorFocused = 0xFFFFFFFF;
 	public int outlineColor = 0xFF808080;
 	public int fillColor = 0xFF000000;
+	
+	public Text text;
 	
 	public GuiListButton(GuiScreen screen) {
 		this.screen = screen;
@@ -23,9 +25,17 @@ public class GuiListButton extends GuiElement implements Focusable {
 	
 	@Override
 	public void draw() {
-		if(isFocused()) {
-			utils.drawRectangle(posX, posY, width, height, outlineColor);
-			utils.drawRectangle(posX + 1, posY + 1, width - 2, height - 2, fillColor);	
+		int highlight = getHighlightColor();
+		if(highlight != 0) {
+			utils.drawRectangle(posX, posY, width, height, highlight);
+			utils.drawRectangle(posX + 1, posY + 1, width - 2, height - 2, fillColor);
+		}
+		
+		if(text != null) {
+			int textWidth = utils.textRenderer.getWidth(text);
+			int textX = posX + (width - textWidth) / 2;
+			int textY = posY + height / 2 - 4;
+			utils.drawString(text, textX, textY, 0xFFFFFF, true);
 		}
 	}
 	
@@ -43,12 +53,23 @@ public class GuiListButton extends GuiElement implements Focusable {
 	public void setFocused(boolean focused) {
 		if(focused != this.focused) {
 			this.focused = focused;
-			for(FocusListener focusListener : focusListeners) {
-				focusListener.focusChanged(this);
-			}
+			onFocusChanged();
 		}
 	}
-
+	
+	public int getHighlightColor() {
+		if(isFocused()) {
+			return outlineColorFocused;
+		}else if(getContainer().getLastFocusedElement() == this) {
+			return outlineColor;
+		}
+		return 0;
+	}
+	
+	public void onFocusChanged() {
+		focusListeners.forEach((e) -> e.focusChanged(this));
+	}
+	
 	@Override
 	public boolean isFocused() {
 		return focused;
@@ -58,16 +79,15 @@ public class GuiListButton extends GuiElement implements Focusable {
 	public boolean isFocusable() {
 		return true;
 	}
-
+	
 	@Override
-	public GuiListButton addFocusListener(FocusListener actionListener) {
-		focusListeners.add(actionListener);
-		return this;
+	public ListenerList<FocusListener> getFocusListeners() {
+		return focusListeners;
 	}
-
+	
 	@Override
-	public boolean removeFocusListener(FocusListener actionListener) {
-		return focusListeners.remove(actionListener);
+	public String toString() {
+		return getClass().getSimpleName() + "[x=" + posX + ",y=" + posY + ",w=" + width + ",h=" + height + ",text=" + (text != null ? text.getString() : null) + "]";
 	}
 
 }

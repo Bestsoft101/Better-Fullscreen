@@ -1,10 +1,8 @@
 package b100.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lwjgl.glfw.GLFW;
 
+import b100.fullscreenfix.FullscreenFix;
 import b100.fullscreenfix.mixin.access.IScreen;
 import net.minecraft.text.Text;
 
@@ -22,15 +20,15 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	 */
 	protected Focusable focusedElement;
 
-	private final List<ScreenListener> screenListeners = new ArrayList<>();
-	private final List<FocusListener> focusListeners = new ArrayList<>();
+	public final ListenerList<ScreenListener> screenListeners = new ListenerList<>(this);
+	public final ListenerList<FocusListener> focusListeners = new ListenerList<>(this);
 	
 	private ScreenWrapper wrapper;
 	
 	public GuiScreen(IScreen parentScreen) {
 		this.parentScreen = parentScreen;
 		
-		addContainerListener(this);
+		containerListeners.add(this);
 	}
 	
 	public void setWrapper(ScreenWrapper wrapper) {
@@ -102,6 +100,7 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 			next = getFirstFocusableElement(direction);
 		}
 		if(next != null) {
+			FullscreenFix.debugPrint("Focus Element: " + next);
 			next.setFocused(true);
 			return true;
 		}
@@ -110,26 +109,31 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	
 	@Override
 	public void elementAdded(GuiContainer parent, GuiElement element) {
-		// Add a FocusListener to all elements added to this screen
+		// Listen for focus changes on all added elements
 		if(element instanceof Focusable) {
 			Focusable focusable = (Focusable) element;
-			focusable.addFocusListener(this);
-		}
-		// Add a ScreenListener to all elements added to this screen
-		if(element instanceof ScreenListener) {
-			ScreenListener screenListener = (ScreenListener) element;
-			addScreenListener(screenListener);
+			focusable.getFocusListeners().add(this);
 		}
 		
-		// Add a ContainerListener to all containers added to this screen,
-		// to make sure that Focusable elements in subcontainers also get a FocusListener
+		// Register listeners automatically
+		if(element instanceof ScreenListener) {
+			ScreenListener screenListener = (ScreenListener) element;
+			screenListeners.add(screenListener);
+		}
+		if(element instanceof FocusListener) {
+			FocusListener focusListener = (FocusListener) element;
+			focusListeners.add(focusListener);
+		}
+		
+		// Add a ContainerListener to all containers added to this screen
+		// Make sure this method is called for all elements already added to the container
 		if(element instanceof GuiContainer) {
 			GuiContainer container = (GuiContainer) element;
 			
 			// Make sure elements that were already added also get a FocusListener
 			container.elements.forEach((e) -> elementAdded(container, e));
 			
-			container.addContainerListener(this);
+			container.containerListeners.add(this);
 		}
 	}
 	
@@ -141,7 +145,7 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 			}
 			this.focusedElement = focusable;
 		}
-		focusListeners.forEach((e) -> e.focusChanged(focusable));
+		focusListeners.forEach((listener) -> listener.focusChanged(focusable));
 	}
 	
 	public GuiElement getMouseOver() {
@@ -165,27 +169,7 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	}
 	
 	public void onScreenOpened() {
-		for(ScreenListener screenListener : screenListeners) {
-			screenListener.onScreenOpened(this);
-		}
-	}
-	
-	public GuiElement addScreenListener(ScreenListener screenListener) {
-		screenListeners.add(screenListener);
-		return this;
-	}
-	
-	public boolean removeScreenListener(ScreenListener screenListener) {
-		return screenListeners.remove(screenListener);
-	}
-	
-	public GuiElement addFocusListener(FocusListener focusListener) {
-		focusListeners.add(focusListener);
-		return this;
-	}
-	
-	public boolean removeFocusListener(FocusListener focusListener) {
-		return focusListeners.remove(focusListener);
+		screenListeners.forEach((listener) -> listener.onScreenOpened(this));
 	}
 	
 	public void setTooltip(Text tooltip) {

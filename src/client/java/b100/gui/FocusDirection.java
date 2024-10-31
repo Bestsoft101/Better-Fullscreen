@@ -4,23 +4,25 @@ import org.lwjgl.glfw.GLFW;
 
 public enum FocusDirection {
 	
-	NEXT_ELEMENT(true, true, false),
-	PREV_ELEMENT(false, true, false),
-	UP(false, false, false),
-	DOWN(true, false, false),
-	LEFT(false, false, false),
-	RIGHT(true, false, false),
-	HOME(false, false, true),
-	END(true, false, true);
+	NEXT_ELEMENT(true, true, false, false),
+	PREV_ELEMENT(false, true, false, false),
+	UP(false, false, false, true),
+	DOWN(true, false, false, true),
+	LEFT(false, false, false, true),
+	RIGHT(true, false, false, true),
+	HOME(false, false, true, false),
+	END(true, false, true, false);
 	
 	private boolean forwards;
 	private boolean tab;
 	private boolean listNavigation;
+	private boolean isArrowKey;
 	
-	private FocusDirection(boolean forwards, boolean tab, boolean listNavigation) {
+	private FocusDirection(boolean forwards, boolean tab, boolean listNavigation, boolean isArrowKey) {
 		this.forwards = forwards;
 		this.tab = tab;
 		this.listNavigation = listNavigation;
+		this.isArrowKey = isArrowKey;
 	}
 	
 	public boolean isForwards() {
@@ -33,6 +35,10 @@ public enum FocusDirection {
 	
 	public boolean isListNavigation() {
 		return listNavigation;
+	}
+	
+	public boolean isArrowKey() {
+		return isArrowKey;
 	}
 	
 	public static FocusDirection get(int keyCode, int modifiers) {

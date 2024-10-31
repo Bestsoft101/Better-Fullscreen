@@ -1,6 +1,7 @@
 package b100.gui;
 
 import b100.fullscreenfix.mixin.access.IScreen;
+import b100.gui.GuiScrollableList.Layout;
 import b100.gui.GuiScrollableList.ListLayout;
 import net.minecraft.text.Text;
 
@@ -8,7 +9,7 @@ public abstract class GuiScrollListScreen extends GuiScreen {
 
 	public GuiScrollableList scrollList;
 	public GuiScrollBar scrollBar;
-	public ListLayout listLayout;
+	public Layout listLayout;
 	
 	public int headerSize = 32;
 	public int footerSize = 32;
@@ -18,10 +19,12 @@ public abstract class GuiScrollListScreen extends GuiScreen {
 	public GuiScrollListScreen(IScreen parentScreen) {
 		super(parentScreen);
 	}
+	
+	public abstract void initScrollElements();
 
 	@Override
 	protected void onInit() {
-		listLayout = new ListLayout();
+		listLayout = getListLayout();
 		scrollList = add(new GuiScrollableList(this, listLayout));
 		scrollBar = add(new GuiScrollBar(this, scrollList));
 		
@@ -56,6 +59,8 @@ public abstract class GuiScrollListScreen extends GuiScreen {
 		right.setPosition(x1, y).setSize(w, 20);
 	}
 	
-	public abstract void initScrollElements();
+	public Layout getListLayout() {
+		return new ListLayout();
+	}
 
 }

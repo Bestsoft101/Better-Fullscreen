@@ -9,12 +9,16 @@ public class ReflectUtils {
 	
 	public static List<Field> getAllFields(Class<?> clazz) {
 		List<Field> fields = new ArrayList<>();
-		for(Field field : clazz.getFields()) {
-			fields.add(field);
+		
+		while(true) {
+			Util.addArrayContentToList(fields, clazz.getDeclaredFields());
+			
+			clazz = clazz.getSuperclass();
+			if(clazz == null) {
+				break;
+			}
 		}
-		for(Field field : clazz.getDeclaredFields()) {
-			fields.add(field);
-		}
+		
 		return fields;
 	}
 	

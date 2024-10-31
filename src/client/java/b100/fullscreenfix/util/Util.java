@@ -22,5 +22,21 @@ public class Util {
 		}
 		return null;
 	}
+	
+	public static <E> void reverseList(List<E> list) {
+		int size = list.size();
+		
+		for(int i = size - 1; i >= 0; i--) {
+			list.add(list.remove(i));
+		}
+	}
+	
+	public static <E> void addArrayContentToList(List<E> list, E[] array) {
+		for(E e : array) {
+			if(e != null) {
+				list.add(e);
+			}
+		}
+	}
 
 }

@@ -1,7 +1,5 @@
 package b100.gui.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 import b100.fullscreenfix.FullscreenFix;
@@ -10,6 +8,7 @@ import b100.gui.GuiButton;
 import b100.gui.GuiContainer;
 import b100.gui.GuiElement;
 import b100.gui.GuiScreen;
+import b100.gui.ListenerList;
 import b100.gui.ScreenListener;
 import net.minecraft.text.Text;
 
@@ -22,7 +21,7 @@ public class CustomOptionElement<E> extends GuiContainer implements ActionListen
 	protected Function<E, Text> toTextFunction;
 	protected Text tooltipText;
 	
-	private final List<ActionListener> actionListeners = new ArrayList<>();
+	private final ListenerList<ActionListener> actionListeners = new ListenerList<>(this);
 	
 	public CustomOptionElement(GuiScreen screen, String key, E value) {
 		this.screen = screen;
@@ -60,9 +59,7 @@ public class CustomOptionElement<E> extends GuiContainer implements ActionListen
 
 	@Override
 	public void actionPerformed(GuiElement source) {
-		for(ActionListener actionListener : actionListeners) {
-			actionListener.actionPerformed(this);
-		}
+		actionListeners.forEach((e) -> e.actionPerformed(this));
 	}
 	
 	@Override

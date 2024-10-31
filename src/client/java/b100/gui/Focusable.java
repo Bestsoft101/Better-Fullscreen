@@ -21,15 +21,7 @@ public interface Focusable {
 	 */
 	public boolean isFocusable();
 	
-	/**
-	 * Add a FocusListener, returns itself
-	 */
-	public GuiElement addFocusListener(FocusListener focusListener);
-	
-	/**
-	 * Remove a FocusListener, returns if the listener was removed
-	 */
-	public boolean removeFocusListener(FocusListener focusListener);
+	public ListenerList<FocusListener> getFocusListeners();
 	
 	public GuiContainer getContainer();
 	
@@ -40,11 +32,19 @@ public interface Focusable {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Recursively search containers for the next focusable element
 	 */
 	public static Focusable findNextFocusableElement(GuiElement element, FocusDirection direction) {
+		try {
+			return findNextFocusableElementDo(element, direction);
+		}catch (CancelAction e) {
+			return null;
+		}
+	}
+	
+	private static Focusable findNextFocusableElementDo(GuiElement element, FocusDirection direction) throws CancelAction {
 		GuiContainer container = element.getContainer();
 		if(container == null) {
 			return null;
@@ -56,7 +56,18 @@ public interface Focusable {
 			return next;
 		}
 		
-		return findNextFocusableElement(container, direction);
+		// When using arrow keys and reaching the end of a list, do nothing
+		if(direction.isArrowKey() && container.isList) {
+			throw new CancelAction();
+		}
+		
+		// Check for next focusable in parent container
+		return findNextFocusableElementDo(container, direction);
+	}
+	
+	@SuppressWarnings("serial")
+	class CancelAction extends Exception {
+		
 	}
 
 }
