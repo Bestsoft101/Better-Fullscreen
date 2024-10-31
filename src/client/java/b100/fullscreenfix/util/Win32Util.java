@@ -24,7 +24,7 @@ public class Win32Util {
 		return hwnd;
 	}
 	
-	public static void updateWindowState(Window window, int windowPosX, int windowPosY, int windowWidth, int windowHeight) {
+	public static void updateWindowState(Window window, int windowPosX, int windowPosY, int windowWidth, int windowHeight, boolean windowWasMaximized) {
 		boolean fullscreen = window.isFullscreen();
 		boolean borderless = FullscreenFix.isBorderlessEnabled();
 		boolean optimizations = FullscreenFix.isWindowsFullscreenOptimizationsEnabled();
@@ -36,9 +36,7 @@ public class Win32Util {
 			FullscreenFix.print("Change to Fullscreen with custom resolution");
 			
 			glfwSetWindowAttrib(window.getHandle(), GLFW_DECORATED, 1);
-			
 			setWindowStyle(hwnd, WS_VISIBLE);
-			
 			glfwHideWindow(window.getHandle());
 			
 			MonitorInfo monitorInfo = new MonitorInfo(fullscreenMode.monitor);
@@ -53,8 +51,13 @@ public class Win32Util {
 
 			glfwSetWindowAttrib(window.getHandle(), GLFW_AUTO_ICONIFY, FullscreenFix.isAutoMinimizeEnabled() ? 1 : 0);
 			glfwShowWindow(window.getHandle());
+			glfwFocusWindow(window.getHandle());
 		}else if(!fullscreen) {
-			FullscreenFix.print("Change to Windowed Mode");
+			if(windowWasMaximized) {
+				FullscreenFix.print("Change to Maximized Windowed Mode");
+			}else {
+				FullscreenFix.print("Change to Windowed Mode");	
+			}
 			
 			if(GLFWUtil.isFullscreen(window)) {
 				GLFWUtil.disableFullscreen(window, windowPosX, windowPosY, windowWidth, windowHeight);
@@ -65,6 +68,9 @@ public class Win32Util {
 			// Set Position and Size
 			glfwSetWindowPos(window.getHandle(), windowPosX, windowPosY);
 			glfwSetWindowSize(window.getHandle(), windowWidth, windowHeight);
+			if(windowWasMaximized) {
+				glfwMaximizeWindow(window.getHandle());
+			}
 		}else if(borderless && !optimizations) {
 			FullscreenFix.print("Change to Borderless Fullscreen without Fullscreen optimizations");
 			
@@ -81,7 +87,6 @@ public class Win32Util {
 			SetWindowPos(hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 			setWindowStyle(hwnd, WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_SYSMENU | WS_GROUP);
 			setWindowExtendedStyle(hwnd, WS_EX_APPWINDOW | WS_EX_ACCEPTFILES | WS_EX_COMPOSITED | WS_EX_LAYERED);
-			
 		}else if(borderless && optimizations) {
 			FullscreenFix.print("Change to Borderless Fullscreen with Fullscreen optimizations");
 			
@@ -95,7 +100,6 @@ public class Win32Util {
 			MonitorInfo monitor = MonitorInfo.getMonitor(window);
 			glfwSetWindowPos(window.getHandle(), monitor.posX, monitor.posY);
 			glfwSetWindowSize(window.getHandle(), monitor.width, monitor.height);
-			
 		}else {
 			FullscreenFix.print("Change to GLFW Fullscreen");
 

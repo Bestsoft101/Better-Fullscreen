@@ -32,11 +32,14 @@ public abstract class WindowMixin {
 	
 	private boolean fullscreenModeHasChanged = false;
 	private net.minecraft.client.util.VideoMode newFullscreenMode;
+
+	private boolean isMaximized = false;
 	
 	private int windowPosX;
 	private int windowPosY;
 	private int windowWidth;
 	private int windowHeight;
+	private boolean windowMaximized;
 	
 	private boolean firstUpdate = true;
 	
@@ -76,6 +79,10 @@ public abstract class WindowMixin {
 		glfwShowWindow(getHandle());
 		initialized = true;
 		
+		glfwSetWindowMaximizeCallback(getHandle(), (window, maximized) -> {
+			isMaximized = maximized;
+		});
+		
 	}
 	
 	@Inject(method = "swapBuffers", at = @At(value = "TAIL"))
@@ -89,29 +96,11 @@ public abstract class WindowMixin {
 	@Inject(method = "updateWindowRegion", at = @At(value = "HEAD"), cancellable = true)
 	private void onUpdateWindowRegion(CallbackInfo ci) {
 		FullscreenFix.debugPrint("Update Window Region");
-		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
 		
 		ci.cancel();
 		if(!initialized) {
 			FullscreenFix.debugPrint("Not initialized!");
 			return;
-		}
-		
-		final long handle = getHandle();
-		
-		if(!wasFullscreen) {
-			int[] i = new int[1];
-			int[] j = new int[1];
-			
-			glfwGetWindowPos(handle, i, j);
-			windowPosX = i[0];
-			windowPosY = j[0];
-			
-			glfwGetWindowSize(handle, i, j);
-			windowWidth = i[0];
-			windowHeight = j[0];
-			
-			FullscreenFix.debugPrint("Window Size: " + windowWidth + " x " + windowHeight + " at " + windowPosX + ", " + windowPosY);
 		}
 		
 		updateWindowState();
@@ -121,7 +110,29 @@ public abstract class WindowMixin {
 	
 	private void updateWindowState() {
 		FullscreenFix.debugPrint("Update Window State");
-		FullscreenFix.debugPrint("Fullscreen: " + fullscreen);
+		
+		if(!wasFullscreen) {
+			windowMaximized = isMaximized;
+			
+			if(!isMaximized) {
+				final long handle = getHandle();
+				
+				int[] i = new int[1];
+				int[] j = new int[1];
+				
+				glfwGetWindowPos(handle, i, j);
+				windowPosX = i[0];
+				windowPosY = j[0];
+				
+				glfwGetWindowSize(handle, i, j);
+				windowWidth = i[0];
+				windowHeight = j[0];
+				
+				FullscreenFix.debugPrint("Window Size: " + windowWidth + " x " + windowHeight + " at " + windowPosX + ", " + windowPosY + ", max: " + windowMaximized);
+			}else {
+				FullscreenFix.debugPrint("Window maximized: " + windowMaximized);
+			}
+		}
 		
 		if(firstUpdate) {
 			firstUpdate = false;
@@ -151,7 +162,7 @@ public abstract class WindowMixin {
 		final long handle = getHandle();
 		
 		if(FullscreenFix.OS_WINDOWS) {
-			Win32Util.updateWindowState(window, windowPosX, windowPosY, windowWidth, windowHeight);
+			Win32Util.updateWindowState(window, windowPosX, windowPosY, windowWidth, windowHeight, windowMaximized);
 			FullscreenFix.windowNeedsUpdate = false;
 			return;
 		}
