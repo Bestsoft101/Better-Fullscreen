@@ -23,6 +23,7 @@ public class GuiScrollableList extends GuiContainer {
 	
 	@Override
 	public void draw() {
+		setScrollAmount(scrollAmount);
 		if(scrollAmountChanged) {
 			scrollAmountChanged = false;
 			layout.moveElements(this);
@@ -67,7 +68,11 @@ public class GuiScrollableList extends GuiContainer {
 	}
 	
 	public void setScrollAmount(double newScrollAmount) {
-		newScrollAmount = Math.clamp(newScrollAmount, 0.0, maxScrollAmount);
+		if(contentHeight < height) {
+			newScrollAmount = -(height - contentHeight) / 2;
+		}else {
+			newScrollAmount = Math.clamp(newScrollAmount, 0.0, maxScrollAmount);	
+		}
 		if(newScrollAmount == scrollAmount) {
 			return;
 		}
@@ -120,6 +125,16 @@ public class GuiScrollableList extends GuiContainer {
 	@Override
 	public Focusable getNextFocusable(GuiElement element, FocusDirection direction) {
 		return super.getNextFocusable(element, direction);
+	}
+	
+	@Override
+	public void onElementAdded(GuiElement element) {
+		super.onElementAdded(element);
+	}
+	
+	@Override
+	public void onElementRemoved(GuiElement element) {
+		super.onElementRemoved(element);
 	}
 	
 	public static interface Layout {

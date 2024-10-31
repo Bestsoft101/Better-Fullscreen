@@ -64,17 +64,26 @@ public class GuiContainer extends GuiElement implements FocusListener {
 			throw new NullPointerException("Added element is null!");
 		}
 		elementsMutable.add(element);
+		onElementAdded(element);
 		element.onAddedToContainer(this);
-		containerListeners.forEach((e) -> e.elementAdded(this, element));
 		return element;
+	}
+	
+	public void onElementAdded(GuiElement element) {
+		containerListeners.forEach((e) -> e.elementAdded(this, element));
 	}
 	
 	public boolean remove(GuiElement element) {
 		if(elementsMutable.remove(element)) {
+			onElementRemoved(element);
 			element.onRemovedFromContainer(this);
 			return true;
 		}
 		return false;
+	}
+	
+	public void onElementRemoved(GuiElement element) {
+		
 	}
 	
 	public boolean contains(GuiElement element) {
