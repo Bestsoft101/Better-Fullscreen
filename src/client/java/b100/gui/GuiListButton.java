@@ -6,8 +6,6 @@ public class GuiListButton extends GuiElement implements Focusable {
 	
 	public GuiScreen screen;
 	
-	private boolean focused = false;
-	
 	private final ListenerList<FocusListener> focusListeners = new ListenerList<>(this);
 	
 	public int outlineColorFocused = 0xFFFFFFFF;
@@ -15,6 +13,9 @@ public class GuiListButton extends GuiElement implements Focusable {
 	public int fillColor = 0xFF000000;
 	
 	public Text text;
+	
+	private boolean clickable = true;
+	private boolean focused = false;
 	
 	public GuiListButton(GuiScreen screen) {
 		this.screen = screen;
@@ -41,7 +42,7 @@ public class GuiListButton extends GuiElement implements Focusable {
 	
 	@Override
 	public boolean mouseEvent(int button, boolean pressed, double mouseX, double mouseY) {
-		if(pressed && screen.isMouseOver(this)) {
+		if(pressed && screen.isMouseOver(this) && clickable) {
 			setFocused(true);
 			return true;
 		}
@@ -77,7 +78,15 @@ public class GuiListButton extends GuiElement implements Focusable {
 	
 	@Override
 	public boolean isFocusable() {
-		return true;
+		return clickable;
+	}
+	
+	public void setClickable(boolean clickable) {
+		this.clickable = clickable;
+	}
+	
+	public boolean isClickable() {
+		return clickable;
 	}
 	
 	@Override

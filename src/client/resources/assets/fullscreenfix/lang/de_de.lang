@@ -1,6 +1,7 @@
 button.cancel=Abbrechen
 button.saveAndQuit=Speichern und Verlassen
 button.done=Fertig
+button.apply=Übernehmen
 
 option.enableMod=Mod Aktivieren (Benötigt Neustart)
 option.fullscreen=Vollbild
@@ -14,6 +15,7 @@ option.autoMinimize=Minimieren bei Fokusverlust
 option.autoMinimize.tooltip=Diese Option funktioniert nur wenn der randlose Vollbildmodus deaktiviert ist.
 option.fullscreenResolution=Vollbildauflösung
 option.fullscreenResolution.tooltip=Wenn man eine eigene Vollbildauflösung benutzt wird der randlose Vollbildmodus deaktiviert.
+option.fullscreenResolution.default=Standard
 option.startInFullscreen=Im Vollbildmodus starten
 option.startInFullscreen.tooltip=Wenn deaktiviert startet das Spiel nicht im Vollbildmodus.
 option.replaceVideoSettings=Vollbild-Schaltfläche ersetzen

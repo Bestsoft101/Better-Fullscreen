@@ -22,24 +22,50 @@ import b100.gui.GuiListButton;
 import b100.gui.GuiScreen;
 import b100.gui.GuiScrollableList;
 import b100.gui.GuiScrollableList.ListLayout;
+import b100.gui.GuiUtils;
 import net.minecraft.text.Text;
 
 public class ScreenResolutionsMenu extends GuiScreen {
+	
+	protected Text title;
 
-	public GuiButton doneButton;
-	
-	public Text title;
+	protected GuiButton cancelButton;
+	protected GuiButton applyButton;
 
-	public int headerSize = 32;
-	public int footerSize = 32;
+	protected int headerSize = 32;
+	protected int footerSize = 32;
 	
-	public GuiScrollableList monitorList;
-	public GuiScrollableList resolutionList;
-	public GuiScrollableList refreshRateList;
+	protected GuiScrollableList monitorList;
+	protected GuiScrollableList resolutionList;
+	protected GuiScrollableList refreshRateList;
 	
-	public RefreshRate selectedMode;
+	protected RefreshRate previousMode;
+	protected RefreshRate selectedMode;
 	
-	private boolean contentChanged = false;
+	/**
+	 * Contains all monitors
+	 */
+	protected final Map<Long, Monitor> monitorMap = new HashMap<>();
+	
+	/**
+	 * Contains the resolution and refresh rate each monitor is set to
+	 */
+	protected final Map<Monitor, RefreshRate> monitorSettings = new HashMap<>();
+	
+	/**
+	 * Contains which resolution was last selected for each monitor
+	 */
+	protected final Map<Monitor, Resolution> focusCacheResolution = new HashMap<>();
+	
+	/**
+	 * Contains which refresh rate was last selected for each resolution
+	 */
+	protected final Map<Resolution, RefreshRate> focusCacheRefreshRate = new HashMap<>();
+	
+	protected Monitor primaryMonitor;
+	
+	protected boolean contentChanged = false;
+	protected boolean initialized = false;
 	
 	public ScreenResolutionsMenu(IScreen parentScreen) {
 		super(parentScreen);
@@ -49,16 +75,11 @@ public class ScreenResolutionsMenu extends GuiScreen {
 	
 	@Override
 	protected void onInit() {
-		doneButton = add(new GuiButton(this, FullscreenFix.translate("button.done")).addActionListener((e) -> {
-			if(selectedMode == null) {
-				FullscreenFix.print("No mode selected!");
-				return;
-			}
-			
-			FullscreenFix.setFullscreenVideoMode(new VideoMode(selectedMode.monitor.info.handle, selectedMode.vidMode));
-			FullscreenFix.setFullscreen(true);
-			FullscreenFix.saveConfig();
-			back();	
+		cancelButton = add(new GuiButton(this, null).addActionListener((e) -> {
+			back();
+		}));
+		applyButton = add(new GuiButton(this, FullscreenFix.translate("button.apply")).addActionListener((e) -> {
+			apply();
 		}));
 		
 		ListLayout layout = new ListLayout();
@@ -70,7 +91,6 @@ public class ScreenResolutionsMenu extends GuiScreen {
 		refreshRateList = add(new GuiScrollableList(this, layout));
 		
 		List<Monitor> monitors = new ArrayList<>();
-		Map<Long, Monitor> monitorMap = new HashMap<>();
 		
 		int monitorNumber = 0;
 		for(long monitorHandle : GLFWUtil.getMonitors()) {
@@ -78,16 +98,17 @@ public class ScreenResolutionsMenu extends GuiScreen {
 			
 			Monitor monitor = monitorMap.get(monitorHandle);
 			if(monitor == null) {
-				monitor = new Monitor(monitorNumber++, monitorInfo);
+				monitor = new Monitor(++monitorNumber, monitorInfo);
 				monitorMap.put(monitorHandle, monitor);
 				monitors.add(monitor);
 			}
 			
 			for(GLFWVidMode vidMode : GLFWUtil.getVideoModes(monitorHandle)) {
-				Resolution resolution = monitor.get(vidMode.width(), vidMode.height());
-				resolution.refreshRates.add(new RefreshRate(monitor, resolution, vidMode));
+				monitor.getOrAdd(vidMode.width(), vidMode.height()).getOrAdd(vidMode);
 			}
 		}
+		
+		monitorList.add(new MonitorElement(this, null));
 		
 		for(int i=0; i < monitors.size(); i++) {
 			Monitor monitor = monitors.get(i);
@@ -100,71 +121,278 @@ public class ScreenResolutionsMenu extends GuiScreen {
 			}
 		}
 		
-		VideoMode videoMode = FullscreenFix.getFullscreenVideoMode();
-		if(videoMode != null) {
-			Monitor monitor = monitorMap.get(videoMode.monitor);
-			setMonitor(monitor);
-		}else {
-			setMonitor(monitors.get(0));
+		// Cache monitor settings
+		for(Monitor monitor : monitors) {
+			Resolution resolution = monitor.get(monitor.info.width, monitor.info.height);
+			RefreshRate refreshRate = resolution.get(monitor.info.refreshRate);
+			monitorSettings.put(monitor, refreshRate);
 		}
+		
+		this.primaryMonitor = monitorMap.get(GLFW.glfwGetPrimaryMonitor());
+		this.previousMode = selectedMode;
+		
+		// Focus currently selected resolution
+		setFocused(getRefreshRate(FullscreenFix.getFullscreenVideoMode()));
+		initialized = true;
 	}
 	
 	@Override
 	public void draw() {
+		utils.drawCenteredString(title, width / 2, headerSize / 2 - 4, 0xFFFFFF, true);
 		if(contentChanged) {
 			onResize();
 		}
 		super.draw();
 	}
 	
-	public boolean setMonitor(Monitor monitor) {
-		if(selectedMode == null || selectedMode.monitor != monitor) {
-			FullscreenFix.debugPrint("Set Monitor: " + monitor.id);
-			
-			// Update Resolution List
-			resolutionList.removeAll();
-			for(Resolution resolution : monitor.resolutions) {
-				ResolutionElement element = new ResolutionElement(this, resolution);
-				resolutionList.add(element);
-			}
-			contentChanged = true;
-			
-			// Set to first resolution
-			setResolution(monitor.resolutions.get(0));	
-			
-			return true;
+	public void apply() {
+		if(selectedMode != null) {
+			FullscreenFix.setFullscreenVideoMode(new VideoMode(selectedMode.monitor.info.handle, selectedMode.vidMode));
+		}else {
+			FullscreenFix.setFullscreenVideoMode(null);
 		}
-		return false;
+		FullscreenFix.setFullscreen(true);
+		FullscreenFix.saveConfig();
+		previousMode = selectedMode;
+		updateButtons();
+	}
+	
+	public void updateButtons() {
+		if(selectedMode != previousMode) {
+			applyButton.setClickable(true);
+			cancelButton.text = FullscreenFix.translate("button.cancel");
+		}else {
+			applyButton.setClickable(false);
+			cancelButton.text = FullscreenFix.translate("button.done");
+		}
+	}
+	
+	@Override
+	public boolean keyEvent(int key, int scancode, int modifiers, boolean pressed) {
+		if(pressed && key == GLFW.GLFW_KEY_ENTER) {
+			apply();
+			back();
+		}
+		return super.keyEvent(key, scancode, modifiers, pressed);
+	}
+	
+	@Override
+	public Focusable getNextScreenFocusableElement(Focusable focusedElement, FocusDirection direction) {
+		GuiElement element = (GuiElement) focusedElement;
+		if(monitorList.contains(element)) {
+			if(direction == FocusDirection.LEFT) return null;
+			if(direction == FocusDirection.RIGHT) return resolutionList.getLastFocusedElement();
+		}
+		if(resolutionList.contains(element)) {
+			if(direction == FocusDirection.LEFT) return monitorList.getLastFocusedElement();
+			if(direction == FocusDirection.RIGHT) return refreshRateList.getLastFocusedElement();
+		}
+		if(refreshRateList.contains(element)) {
+			if(direction == FocusDirection.LEFT) return resolutionList.getLastFocusedElement();
+			if(direction == FocusDirection.RIGHT) return null;
+		}
+		return super.getNextScreenFocusableElement(focusedElement, direction);
+	}
+	
+	public RefreshRate getRefreshRate(VideoMode videoMode) {
+		if(videoMode == null) {
+			return null;
+		}
+		FullscreenFix.debugPrint("Get RefreshRate: " + videoMode.toConfigString());
+		
+		Monitor monitor = monitorMap.get(videoMode.monitor);
+		FullscreenFix.debugPrint("  Monitor: " + monitor);
+		if(monitor == null) {
+			return null;
+		}
+		
+		Resolution resolution = monitor.get(videoMode.vidMode.width(), videoMode.vidMode.height());
+		FullscreenFix.debugPrint("  Resolution: " + resolution);
+		if(resolution == null) {
+			return null;
+		}
+		
+		RefreshRate refreshRate = resolution.get(videoMode.vidMode);
+		FullscreenFix.debugPrint("  Refresh Rate: " + refreshRate);
+		
+		return refreshRate;
+	}
+	
+	public void setFocused(RefreshRate refreshRate) {
+		FullscreenFix.debugPrint("Focus: " + refreshRate);
+		
+		if(refreshRate == null) {
+			getMonitorElement(null).setFocused(true);
+			return;
+		}
+		
+		if(!isRefreshRateSet(refreshRate)) {
+			if(!isResolutionSet(refreshRate.resolution)) {
+				if(!isMonitorSet(refreshRate.monitor)) {
+					getMonitorElement(refreshRate.monitor).setFocused(true);
+				}
+				getResolutionElement(refreshRate.resolution).setFocused(true);
+			}
+			getRefreshRateElement(refreshRate).setFocused(true);
+		}
+	}
+	
+	public boolean setMonitor(Monitor monitor) {
+		if(isMonitorSet(monitor)) {
+			return false;
+		}
+		
+		FullscreenFix.debugPrint("Set Monitor: " + monitor);
+		resolutionList.removeAll();
+		
+		if(monitor != null) {
+
+			// Build menu
+			for(Resolution resolution : monitor.resolutions) {
+				resolutionList.add(new ResolutionElement(this, resolution));
+			}
+			
+			// Select resolution
+			Resolution resolution = focusCacheResolution.get(monitor);
+			if(resolution == null) {
+				resolution = monitorSettings.get(monitor).resolution;
+			}
+			ResolutionElement resolutionElement = getResolutionElement(resolution);
+			if(resolutionElement != null) {
+				resolutionElement.setFocused(true);
+			}else {
+				FullscreenFix.debugPrint("No resolution element to focus!");	
+			}
+		}else {
+			setResolution(null);
+		}
+		contentChanged = true;
+		
+		return true;
 	}
 	
 	public boolean setResolution(Resolution resolution) {
-		if(selectedMode == null || selectedMode.resolution != resolution) {
-			FullscreenFix.debugPrint("Set Resolution: " + resolution.width + " x " + resolution.height);
-			
-			// Update Refresh Rate List
-			refreshRateList.removeAll();
-			for(RefreshRate refreshRate : resolution.refreshRates) {
-				RefreshRateElement element = new RefreshRateElement(this, refreshRate);
-				refreshRateList.add(element);
-			}
-			contentChanged = true;
-			
-			// Set to first refresh rate
-			setRefreshRate(resolution.refreshRates.get(0));
-			
-			return true;
+		if(isResolutionSet(resolution)) {
+			return false;
 		}
-		return false;
+		
+		FullscreenFix.debugPrint("Set Resolution: " + resolution);
+		refreshRateList.removeAll();
+		
+		if(resolution != null) {
+			// Build menu
+			for(RefreshRate refreshRate : resolution.refreshRates) {
+				refreshRateList.add(new RefreshRateElement(this, refreshRate));
+			}
+			
+			// Put in cache
+			focusCacheResolution.put(resolution.monitor, resolution);
+			
+			// Focus refresh rate
+			focusCacheRefreshRate.clear();
+			RefreshRate refreshRate = focusCacheRefreshRate.get(resolution);
+			if(refreshRate == null) {
+				RefreshRate defaultRefreshRate = monitorSettings.get(resolution.monitor);
+				if(defaultRefreshRate != null && defaultRefreshRate.resolution == resolution) {
+					refreshRate = defaultRefreshRate;
+				}
+			}
+			if(refreshRate == null) {
+				refreshRate = resolution.refreshRates.get(0);
+			}
+			RefreshRateElement refreshRateElement = getRefreshRateElement(refreshRate);
+			if(refreshRateElement != null) {
+				refreshRateElement.setFocused(true);
+			}else {
+				FullscreenFix.debugPrint("No element to focus for " + refreshRate + "!");	
+			}
+		}else {
+			setRefreshRate(null);
+		}
+		contentChanged = true;
+		
+		return true;
 	}
 	
 	public boolean setRefreshRate(RefreshRate refreshRate) {
-		if(selectedMode != refreshRate) {
-			FullscreenFix.debugPrint("Set Refresh Rate: " + refreshRate.get() + "hz");
-			selectedMode = refreshRate;
-			
-			return true;
+		if(isRefreshRateSet(refreshRate)) {
+			return false;
 		}
-		return false;
+		
+		FullscreenFix.debugPrint("Set Refresh Rate: " + refreshRate);
+		
+		if(refreshRate != null) {
+			// Put in cache
+			focusCacheRefreshRate.put(refreshRate.resolution, refreshRate);
+		}
+		selectedMode = refreshRate;
+		
+		updateButtons();
+		
+		return true;
+	}
+	
+	public boolean isMonitorSet(Monitor monitor) {
+		if(!initialized) {
+			return false;
+		}
+		if(selectedMode == null) {
+			return monitor == null;
+		}
+		return selectedMode.monitor == monitor;
+	}
+	
+	public boolean isResolutionSet(Resolution resolution) {
+		if(!initialized) {
+			return false;
+		}
+		if(selectedMode == null) {
+			return resolution == null;
+		}
+		return selectedMode.resolution == resolution;
+	}
+	
+	public boolean isRefreshRateSet(RefreshRate refreshRate) {
+		if(!initialized) {
+			return false;
+		}
+		return selectedMode == refreshRate;
+	}
+	
+	public MonitorElement getMonitorElement(Monitor monitor) {
+		for(GuiElement element : monitorList.elements) {
+			if(element instanceof MonitorElement) {
+				MonitorElement monitorElement = (MonitorElement) element;
+				if(monitorElement.monitor == monitor) {
+					return monitorElement;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public ResolutionElement getResolutionElement(Resolution resolution) {
+		for(GuiElement element : resolutionList.elements) {
+			if(element instanceof ResolutionElement) {
+				ResolutionElement resolutionElement = (ResolutionElement) element;
+				if(resolutionElement.resolution == resolution) {
+					return resolutionElement;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public RefreshRateElement getRefreshRateElement(RefreshRate refreshRate) {
+		for(GuiElement element : refreshRateList.elements) {
+			if(element instanceof RefreshRateElement) {
+				RefreshRateElement resolutionElement = (RefreshRateElement) element;
+				if(resolutionElement.refreshRate == refreshRate) {
+					return resolutionElement;
+				}
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -194,7 +422,7 @@ public class ScreenResolutionsMenu extends GuiScreen {
 			element.setSize(smallListsWidth, 20);
 		}
 		
-		doneButton.setPosition(this.width / 2 - 100, this.height - footerSize + 4);
+		GuiUtils.setDoubleFooterButtonPositions(this, height - footerSize + 4, applyButton, cancelButton);
 		
 		super.onResize();
 	}
@@ -206,10 +434,10 @@ public class ScreenResolutionsMenu extends GuiScreen {
 	
 	class Monitor {
 		
-		public int id;
-		public MonitorInfo info;
-		public String name;
-		public List<Resolution> resolutions = new ArrayList<>();
+		public final int id;
+		public final MonitorInfo info;
+		public final String name;
+		public final List<Resolution> resolutions = new ArrayList<>();
 		
 		public Monitor(int id, MonitorInfo monitorInfo) {
 			this.id = id;
@@ -223,9 +451,21 @@ public class ScreenResolutionsMenu extends GuiScreen {
 					return resolution;
 				}
 			}
-			Resolution resolution = new Resolution(this, w, h);
-			resolutions.add(resolution);
+			return null;
+		}
+		
+		public Resolution getOrAdd(int w, int h) {
+			Resolution resolution = get(w, h);
+			if(resolution == null) {
+				resolution = new Resolution(this, w, h);
+				resolutions.add(resolution);
+			}
 			return resolution;
+		}
+		
+		@Override
+		public String toString() {
+			return "Monitor[" + id + "]";
 		}
 	}
 	
@@ -241,6 +481,41 @@ public class ScreenResolutionsMenu extends GuiScreen {
 			this.width = width;
 			this.height = height;
 		}
+		
+		public RefreshRate getOrAdd(GLFWVidMode vidMode) {
+			RefreshRate refreshRate = get(vidMode);
+			if(refreshRate == null) {
+				refreshRate = new RefreshRate(this, vidMode);
+				refreshRates.add(refreshRate);
+			}
+			return refreshRate;
+		}
+		
+		public RefreshRate get(GLFWVidMode vidMode) {
+			for(RefreshRate refreshRate : refreshRates) {
+				if(refreshRate.vidMode.equals(vidMode)) {
+					return refreshRate;
+				}
+			}
+			return null;
+		}
+		
+		public RefreshRate get(int rate) {
+			for(RefreshRate refreshRate : refreshRates) {
+				if(refreshRate.vidMode.refreshRate() == rate) {
+					return refreshRate;
+				}
+			}
+			return null;
+		}
+		
+		@Override
+		public String toString() {
+			return "Resolution["
+					+ monitor + ","
+					+ width + "x" + height
+					+ "]";
+		}
 	}
 	
 	class RefreshRate {
@@ -249,14 +524,22 @@ public class ScreenResolutionsMenu extends GuiScreen {
 		public final Resolution resolution;
 		public final GLFWVidMode vidMode;
 		
-		public RefreshRate(Monitor monitor, Resolution resolution, GLFWVidMode vidMode) {
-			this.monitor = monitor;
+		public RefreshRate(Resolution resolution, GLFWVidMode vidMode) {
+			this.monitor = resolution.monitor;
 			this.resolution = resolution;
 			this.vidMode = vidMode;
 		}
 		
 		public int get() {
 			return vidMode.refreshRate();
+		}
+		
+		@Override
+		public String toString() {
+			return "RefreshRate["
+					+ resolution + ","
+					+ vidMode.refreshRate() + "hz"
+					+ "]";
 		}
 	}
 	
@@ -267,7 +550,11 @@ public class ScreenResolutionsMenu extends GuiScreen {
 		public MonitorElement(GuiScreen screen, Monitor monitor) {
 			super(screen);
 			this.monitor = monitor;
-			this.text = Text.of("Monitor " + (monitor.id + 1));
+			if(monitor != null) {
+				this.text = Text.of("Monitor " + monitor.id);
+			}else {
+				this.text = FullscreenFix.translate("option.fullscreenResolution.default");
+			}
 		}
 		
 		@Override
@@ -276,17 +563,6 @@ public class ScreenResolutionsMenu extends GuiScreen {
 				setMonitor(monitor);	
 			}
 			super.onFocusChanged();
-		}
-		
-		@Override
-		public int getHighlightColor() {
-			int color = super.getHighlightColor();
-			if((color & 0xFF000000) == 0) {
-				if(selectedMode != null && selectedMode.monitor == monitor) {
-					return outlineColor;
-				}
-			}
-			return color;
 		}
 	}
 	
@@ -307,17 +583,6 @@ public class ScreenResolutionsMenu extends GuiScreen {
 			}
 			super.onFocusChanged();
 		}
-		
-		@Override
-		public int getHighlightColor() {
-			int color = super.getHighlightColor();
-			if((color & 0xFF000000) == 0) {
-				if(selectedMode != null && selectedMode.resolution == resolution) {
-					return outlineColor;
-				}
-			}
-			return color;
-		}
 	}
 	
 	class RefreshRateElement extends GuiListButton {
@@ -336,17 +601,6 @@ public class ScreenResolutionsMenu extends GuiScreen {
 				setRefreshRate(refreshRate);
 			}
 			super.onFocusChanged();
-		}
-		
-		@Override
-		public int getHighlightColor() {
-			int color = super.getHighlightColor();
-			if(color == 0) {
-				if(selectedMode != null && selectedMode == refreshRate) {
-					return outlineColor;
-				}
-			}
-			return color;
 		}
 	}
 }

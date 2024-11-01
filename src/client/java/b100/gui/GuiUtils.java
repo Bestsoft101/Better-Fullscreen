@@ -76,5 +76,15 @@ public class GuiUtils {
 	public boolean isInWorld() {
 		return MinecraftClient.getInstance().world != null;
 	}
+	
+	public static void setDoubleFooterButtonPositions(GuiScreen screen, int y, GuiElement left, GuiElement right) {
+		int p = 2;
+		int w = 150;
+		int center = screen.width / 2;
+		int x0 = center - w - p;
+		int x1 = center + p;
+		left.setPosition(x0, y).setSize(w, 20);
+		right.setPosition(x1, y).setSize(w, 20);
+	}
 
 }

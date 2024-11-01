@@ -88,6 +88,20 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	}
 	
 	public boolean focusNextElement(FocusDirection direction) {
+		Focusable next = getNextScreenFocusableElement(focusedElement, direction);
+		if(next != null) {
+			FullscreenFix.debugPrint("Focus Element: " + next);
+			next.setFocused(true);
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Search for the next focusable element on this screen, starting at the given element.
+	 * <br> Screens with custom focus behavior should override this method!
+	 */
+	public Focusable getNextScreenFocusableElement(Focusable focusedElement, FocusDirection direction) {
 		Focusable next;
 		if(focusedElement != null) {
 			next = Focusable.findNextFocusableElement((GuiElement) focusedElement, direction);
@@ -99,12 +113,7 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 		}else {
 			next = getFirstFocusableElement(direction);
 		}
-		if(next != null) {
-			FullscreenFix.debugPrint("Focus Element: " + next);
-			next.setFocused(true);
-			return true;
-		}
-		return false;
+		return next;
 	}
 	
 	@Override

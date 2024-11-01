@@ -197,6 +197,14 @@ public class GuiContainer extends GuiElement implements FocusListener {
 		}
 		return lastFocusedElement;
 	}
+	
+	public boolean setLastFocusedElement(Focusable element) {
+		if(contains((GuiElement) element)) {
+			lastFocusedElement = element;
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	public void focusChanged(Focusable focusable) {

@@ -47,16 +47,9 @@ public abstract class GuiScrollListScreen extends GuiScreen {
 		scrollBar.setPosition(scrollList.posX + scrollList.width / 2 + contentWidth / 2 + 16, scrollList.posY + 2).setSize(scrollBarWidth, scrollList.height - 4);
 		super.onResize();
 	}
-	
+
 	public void setDoubleFooterButtonPositions(GuiElement left, GuiElement right) {
-		int p = 2;
-		int w = 150;
-		int center = width / 2;
-		int x0 = center - w - p;
-		int x1 = center + p;
-		int y = height - footerSize + 4;
-		left.setPosition(x0, y).setSize(w, 20);
-		right.setPosition(x1, y).setSize(w, 20);
+		GuiUtils.setDoubleFooterButtonPositions(this, height - footerSize + 4, left, right);
 	}
 	
 	public Layout getListLayout() {
