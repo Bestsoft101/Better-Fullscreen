@@ -1,21 +1,17 @@
 package b100.fullscreenfix;
 
-import java.io.File;
-import java.nio.file.Paths;
+import static b100.fullscreenfix.Global.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.mojang.serialization.Codec;
 
 import b100.fullscreenfix.mixin.access.WindowAccess;
 import b100.fullscreenfix.util.ConfigUtil;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -31,24 +27,14 @@ import net.minecraft.util.math.MathHelper;
 
 public class FullscreenFix {
 
-	public static final boolean INDEV = FabricLoader.getInstance().isDevelopmentEnvironment();
-	public static final String MODID = "fullscreenfix";
-	private static final Logger LOGGER = LoggerFactory.getLogger(MODID);
-	public static final boolean OS_WINDOWS = isWindows();
-	
 	private static Window window;
 	
 	// Config
 	
-	private static File configFolder = Paths.get("config").toFile();
-	private static File configFile = new File(configFolder, MODID + ".properties");
-	
 	public static boolean windowNeedsUpdate = true;
 	public static boolean fullscreenModeWasChanged = false;
 	
-	private static final boolean enableMod;
-	
-	private static boolean enableModNextLaunch = true;
+	private static boolean enableModNextLaunch = Global.MOD_ENABLED;
 	private static boolean borderlessFullscreen = true;
 	private static boolean fullscreenOptimizations = true;
 	private static boolean autoMinimize = true;
@@ -69,15 +55,9 @@ public class FullscreenFix {
 	
 	static {
 		loadConfig();
-		
-		enableMod = enableModNextLaunch;
 	}
 	
 	////////////////////////////////////
-	
-	public static boolean isModEnabled() {
-		return enableMod;
-	}
 	
 	public static boolean isModEnabledNextLaunch() {
 		return enableModNextLaunch;
@@ -253,7 +233,7 @@ public class FullscreenFix {
 	////////////////////////////////////
 	
 	public static void loadConfig() {
-		ConfigUtil.loadConfig(configFile, (key, value) -> parse(key, value), ':');
+		ConfigUtil.loadConfig(CONFIG_FILE, (key, value) -> parse(key, value), ':');
 	}
 	
 	public static void saveConfig() {
@@ -268,13 +248,11 @@ public class FullscreenFix {
 		}
 		str.append("replaceVideoSettingsButton:" + replaceVideoSettingsButton + "\n");
 		
-		ConfigUtil.saveStringToFile(str.toString(), configFile);
+		ConfigUtil.saveStringToFile(str.toString(), CONFIG_FILE);
 	}
 
 	public static void parse(String key, String value) {
-		if(key.equals("enableMod")) {
-			enableModNextLaunch = value.equalsIgnoreCase("true");
-		}else if(key.equals("borderlessFullscreen")) {
+		if(key.equals("borderlessFullscreen")) {
 			borderlessFullscreen = value.equalsIgnoreCase("true");
 		}else if(key.equals("fullscreenOptimizations")) {
 			fullscreenOptimizations = value.equalsIgnoreCase("true");
@@ -352,10 +330,6 @@ public class FullscreenFix {
 	
 	////////////////////////////////////
 	
-	private static boolean isWindows() {
-		return System.getProperty("os.name").toLowerCase().contains("windows");
-	}
-	
 	public static void debugPrint(String string) {
 		if(INDEV) {
 			System.out.print("[FullscreenFixDebug] " + string + "\n");
@@ -363,11 +337,7 @@ public class FullscreenFix {
 	}
 	
 	public static void print(String string) {
-		if(INDEV) {
-			System.out.print("[FullscreenFix] " + string + "\n");
-		}else {
-			LOGGER.info("[FullscreenFix] " + string);	
-		}
+		Global.print(string);
 	}
 
 }

@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import b100.fullscreenfix.FullscreenFix;
+import b100.fullscreenfix.Global;
 import b100.fullscreenfix.MonitorInfo;
 import b100.fullscreenfix.VideoMode;
 import b100.fullscreenfix.util.GLFWUtil;
@@ -161,7 +162,7 @@ public abstract class WindowMixin {
 		final Window window = (Window)(Object)this;
 		final long handle = getHandle();
 		
-		if(FullscreenFix.OS_WINDOWS) {
+		if(Global.OS_WINDOWS) {
 			Win32Util.updateWindowState(window, windowPosX, windowPosY, windowWidth, windowHeight, windowMaximized);
 			FullscreenFix.windowNeedsUpdate = false;
 			return;

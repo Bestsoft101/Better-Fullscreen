@@ -1,6 +1,7 @@
 package b100.fullscreenfix.gui;
 
 import b100.fullscreenfix.FullscreenFix;
+import b100.fullscreenfix.Global;
 import b100.fullscreenfix.VideoMode;
 import b100.fullscreenfix.mixin.access.IScreen;
 import b100.gui.GuiButton;
@@ -44,11 +45,11 @@ public class ConfigScreen extends GuiScrollListScreen {
 	public void initScrollElements() {
 		scrollList.add(new BooleanToggleElement(this, "option.enableMod", FullscreenFix.isModEnabledNextLaunch()).addSaveConsumer(newValue -> FullscreenFix.setModEnabled(newValue)));
 		
-		if(FullscreenFix.isModEnabled()) {
+		if(Global.MOD_ENABLED) {
 			scrollList.add(new BooleanToggleElement(this, "option.fullscreen", FullscreenFix.isFullscreenEnabled()).addSaveConsumer(newValue -> FullscreenFix.setFullscreen(newValue)));
 			scrollList.add(new BooleanToggleElement(this, "option.borderlessFullscreen", FullscreenFix.isBorderlessEnabled()).addSaveConsumer(newValue -> FullscreenFix.setBorderless(newValue)));
 			
-			if(FullscreenFix.OS_WINDOWS) {
+			if(Global.OS_WINDOWS) {
 				scrollList.add(new BooleanToggleElement(this, "option.windowsFullscreenOptimizations", FullscreenFix.isWindowsFullscreenOptimizationsEnabled()).addSaveConsumer(newValue -> FullscreenFix.setWindowsFullscreenOptimizations(newValue)));
 			}
 			

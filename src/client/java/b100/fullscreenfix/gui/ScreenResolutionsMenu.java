@@ -75,13 +75,13 @@ public class ScreenResolutionsMenu extends GuiScreen {
 	
 	@Override
 	protected void onInit() {
-		cancelButton = add(new GuiButton(this, null).addActionListener((e) -> {
-			back();
-		}));
-		applyButton = add(new GuiButton(this, FullscreenFix.translate("button.apply")).addActionListener((e) -> {
-			apply();
-		}));
+		applyButton = new GuiButton(this, FullscreenFix.translate("button.apply"));
+		cancelButton = new GuiButton(this, null);
 		
+		applyButton.addActionListener((e) -> apply());
+		cancelButton.addActionListener((e) -> back());
+		
+		// Setup Lists
 		ListLayout layout = new ListLayout();
 		layout.innerPadding = 0;
 		layout.outerPadding = 2;
@@ -128,12 +128,18 @@ public class ScreenResolutionsMenu extends GuiScreen {
 			monitorSettings.put(monitor, refreshRate);
 		}
 		
+		RefreshRate fullscreenMode = getRefreshRate(FullscreenFix.getFullscreenVideoMode());
+		
 		this.primaryMonitor = monitorMap.get(GLFW.glfwGetPrimaryMonitor());
-		this.previousMode = selectedMode;
+		this.previousMode = fullscreenMode;
 		
 		// Focus currently selected resolution
-		setFocused(getRefreshRate(FullscreenFix.getFullscreenVideoMode()));
+		setFocused(fullscreenMode);
 		initialized = true;
+		
+		// Add buttons after everything else
+		add(applyButton);
+		add(cancelButton);
 	}
 	
 	@Override

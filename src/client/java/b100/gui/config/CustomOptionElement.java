@@ -44,7 +44,7 @@ public class CustomOptionElement<E> extends GuiContainer implements ActionListen
 	@Override
 	public void draw() {
 		GuiElement mouseOver = button.screen.getMouseOver();
-		if(mouseOver == this || contains(mouseOver)) {
+		if(mouseOver == this || contains(mouseOver) || button.isFocused()) {
 			utils.drawRectangle(posX, posY, width, height, 0x20FFFFFF);
 			
 			if(tooltipText != null) {

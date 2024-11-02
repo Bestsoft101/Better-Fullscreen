@@ -21,9 +21,6 @@
 	},
 	"environment": "client",
 	"entrypoints": {
-		"client": [
-			"b100.fullscreenfix.FullscreenFixInit"
-		],
 		"modmenu": [
 			"b100.fullscreenfix.ModMenuIntegration"
 		]
