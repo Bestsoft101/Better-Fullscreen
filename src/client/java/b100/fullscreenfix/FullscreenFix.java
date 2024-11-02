@@ -2,6 +2,7 @@ package b100.fullscreenfix;
 
 import static b100.fullscreenfix.Global.*;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import com.mojang.serialization.Codec;
 
 import b100.fullscreenfix.mixin.access.WindowAccess;
 import b100.fullscreenfix.util.ConfigUtil;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -290,15 +292,21 @@ public class FullscreenFix {
 	}
 	
 	private static void loadLanguage(String name) {
-		String path = "lang/" + name + ".lang";
-		Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.of(MODID, path));
-		if(!resource.isPresent()) {
-			print("Resource not present: " + path);
-			return;
-		}
+		InputStream stream = null;
 		
 		try {
-			ConfigUtil.loadConfig(resource.get().getInputStream(), (key, value) -> translations.put(key, value), '=');	
+			if(FabricLoader.getInstance().isModLoaded("fabric-api")) {
+				String path = "lang/" + name + ".lang";
+				Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.of(MODID, path));
+				stream = resource.get().getInputStream();
+				if(!resource.isPresent()) {
+					print("Resource not present: " + path);
+					return;
+				}
+			}else {
+				stream = FullscreenFix.class.getResourceAsStream("/assets/" + Global.MODID + "/lang/" + name + ".lang");
+			}
+			ConfigUtil.loadConfig(stream, (key, value) -> translations.put(key, value), '=');	
 		}catch (Exception e) {
 			throw new RuntimeException("Loading language: " + name, e);
 		}
