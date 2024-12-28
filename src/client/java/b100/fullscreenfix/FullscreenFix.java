@@ -298,13 +298,14 @@ public class FullscreenFix {
 			if(FabricLoader.getInstance().isModLoaded("fabric-api")) {
 				String path = "lang/" + name + ".lang";
 				Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.of(MODID, path));
-				stream = resource.get().getInputStream();
-				if(!resource.isPresent()) {
-					print("Resource not present: " + path);
-					return;
+				if(resource.isPresent()) {
+					stream = resource.get().getInputStream();
 				}
 			}else {
 				stream = FullscreenFix.class.getResourceAsStream("/assets/" + Global.MODID + "/lang/" + name + ".lang");
+			}
+			if(stream == null) {
+				return;
 			}
 			ConfigUtil.loadConfig(stream, (key, value) -> translations.put(key, value), '=');	
 		}catch (Exception e) {
