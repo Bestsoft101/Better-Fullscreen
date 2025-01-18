@@ -18,7 +18,6 @@ import b100.fullscreenfix.VideoMode;
 import b100.fullscreenfix.util.GLFWUtil;
 import b100.fullscreenfix.util.MacUtil;
 import b100.fullscreenfix.util.Win32Util;
-import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.client.util.MonitorTracker;
 import net.minecraft.client.util.Window;
 
