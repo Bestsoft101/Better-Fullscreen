@@ -21,27 +21,53 @@ public class Global {
 	public static final File CONFIG_FOLDER = Paths.get("config").toFile();
 	public static final File CONFIG_FILE = new File(CONFIG_FOLDER, MODID + ".properties");
 	public static final String MIXIN_PACKAGE = "b100." + MODID + ".mixin";
-	public static final boolean OS_WINDOWS = isWindows();
-	public static final boolean MOD_ENABLED = isModEnabled();
+	public static final OperatingSystem OS;
+	public static final boolean MOD_ENABLED;
 	
 	static {
-		if(!MOD_ENABLED) {
-			print("Mod disabled in config!");	
-		}
-	}
-	
-	private static boolean isModEnabled() {
 		final MutableObject<Boolean> enabled = new MutableObject<>(true);
+		final MutableObject<Boolean> ignoreOS = new MutableObject<>(false);
+		
 		ConfigUtil.loadConfig(Global.CONFIG_FILE, (key, value) -> {
 			if(key.equals("enableMod")) {
 				enabled.setValue(value.equalsIgnoreCase("true"));
 			}
+			if(key.equals("ignoreOS")) {
+				ignoreOS.setValue(value.equalsIgnoreCase("true"));
+			}
 		}, ':');
-		return enabled.getValue();
+		
+		MOD_ENABLED = enabled.getValue();
+		if(!MOD_ENABLED) {
+			print("Mod disabled in config!");
+		}
+		
+		if(ignoreOS.getValue()) {
+			print("Ignore OS is enabled. Any operating system specific fixes or optimizations will be disabled!");
+			OS = OperatingSystem.OTHER;
+		}else {
+			OS = getOS();
+		}
+		
+		debugPrint("OS: " + OS);
 	}
 	
-	private static boolean isWindows() {
-		return System.getProperty("os.name").toLowerCase().contains("windows");
+	private static OperatingSystem getOS() {
+		String osname = System.getProperty("os.name").toLowerCase();
+		if(osname.contains("windows")) {
+			return OperatingSystem.WINDOWS;
+		}else if(osname.contains("mac")) {
+			return OperatingSystem.MAC;
+		}
+		return OperatingSystem.OTHER;
+	}
+	
+	public static boolean isWindows() {
+		return OS == OperatingSystem.WINDOWS;
+	}
+	
+	public static boolean isMac() {
+		return OS == OperatingSystem.MAC;
 	}
 	
 	static void print(String string) {
@@ -49,6 +75,12 @@ public class Global {
 			System.out.print("[FullscreenFix] " + string + "\n");
 		}else {
 			LOGGER.info("[FullscreenFix] " + string);	
+		}
+	}
+	
+	static void debugPrint(String string) {
+		if(INDEV) {
+			System.out.print("[FullscreenFixDebug] " + string + "\n");
 		}
 	}
 

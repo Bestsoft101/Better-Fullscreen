@@ -8,6 +8,7 @@ import java.util.List;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.glfw.GLFWVidMode;
 
+import b100.fullscreenfix.Global;
 import b100.fullscreenfix.MonitorInfo;
 import net.minecraft.client.util.VideoMode;
 import net.minecraft.client.util.Window;
@@ -15,7 +16,15 @@ import net.minecraft.client.util.Window;
 public class GLFWUtil {
 	
 	public static void enableFullscreen(Window window, MonitorInfo monitor) {
+		if(Global.isMac()) {
+			MacUtil.toggleFullscreen(window.getHandle());
+		}
+		
 		glfwSetWindowMonitor(window.getHandle(), monitor.handle, monitor.posX, monitor.posY, monitor.width, monitor.height, monitor.refreshRate);
+
+		if(Global.isMac()) {
+			MacUtil.fixStyleMask(window.getHandle());
+		}
 	}
 	
 	public static void disableFullscreen(Window window, int x, int y, int w, int h) {

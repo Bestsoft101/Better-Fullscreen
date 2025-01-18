@@ -42,6 +42,12 @@ public class ConfigScreen extends GuiScrollListScreen {
 	}
 	
 	@Override
+	public void draw() {
+		super.draw();
+		utils.drawString("Operating System: " + Global.OS, 2, 2, 0xFFFFFF, true);
+	}
+	
+	@Override
 	public void initScrollElements() {
 		scrollList.add(new BooleanToggleElement(this, "option.enableMod", FullscreenFix.isModEnabledNextLaunch()).addSaveConsumer(newValue -> FullscreenFix.setModEnabled(newValue)));
 		
@@ -49,7 +55,7 @@ public class ConfigScreen extends GuiScrollListScreen {
 			scrollList.add(new BooleanToggleElement(this, "option.fullscreen", FullscreenFix.isFullscreenEnabled()).addSaveConsumer(newValue -> FullscreenFix.setFullscreen(newValue)));
 			scrollList.add(new BooleanToggleElement(this, "option.borderlessFullscreen", FullscreenFix.isBorderlessEnabled()).addSaveConsumer(newValue -> FullscreenFix.setBorderless(newValue)));
 			
-			if(Global.OS_WINDOWS) {
+			if(Global.isWindows()) {
 				scrollList.add(new BooleanToggleElement(this, "option.windowsFullscreenOptimizations", FullscreenFix.isWindowsFullscreenOptimizationsEnabled()).addSaveConsumer(newValue -> FullscreenFix.setWindowsFullscreenOptimizations(newValue)));
 			}
 			

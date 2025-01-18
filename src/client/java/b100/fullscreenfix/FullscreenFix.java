@@ -42,6 +42,7 @@ public class FullscreenFix {
 	private static boolean autoMinimize = true;
 	private static boolean startInFullscreen = true;
 	private static boolean replaceVideoSettingsButton = true;
+	private static boolean ignoreOS = false;
 	
 	/**
 	 * May be null for current resolution
@@ -249,6 +250,7 @@ public class FullscreenFix {
 			str.append("fullscreenMode:" + fullscreenVideoMode.toConfigString() + "\n");	
 		}
 		str.append("replaceVideoSettingsButton:" + replaceVideoSettingsButton + "\n");
+		str.append("ignoreOS:" + ignoreOS + "\n");
 		
 		ConfigUtil.saveStringToFile(str.toString(), CONFIG_FILE);
 	}
@@ -266,6 +268,8 @@ public class FullscreenFix {
 			fullscreenVideoMode = VideoMode.parse(value);
 		}else if(key.equals("replaceVideoSettingsButton")) {
 			replaceVideoSettingsButton = value.equalsIgnoreCase("true");
+		}else if(key.equals("ignoreOS")) {
+			ignoreOS = value.equalsIgnoreCase("true");
 		}
 	}
 	
@@ -283,15 +287,43 @@ public class FullscreenFix {
 		translations.clear();
 		String language = languageManager.getLanguage();
 		
+		boolean loaded = false;
+		
 		if(!language.equals("en_us")) {
-			loadLanguage("en_us");
+			loaded |= loadLanguage("en_us");
 		}
-		loadLanguage(language);
+		loaded |= loadLanguage(language);
+		
+		if(!loaded || translations.size() == 0) {
+			boolean fabricApi = FabricLoader.getInstance().isModLoaded("fabric-api");
+			
+			Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(Identifier.of(MODID, "lang/en_us.lang"));
+			boolean resourceExists = resource.isPresent();
+			
+			boolean streamExists;
+			InputStream stream = null;
+			try {
+				stream = FullscreenFix.class.getResourceAsStream("assets/" + MODID);
+				streamExists = stream != null;
+			}catch (Exception e) {
+				e.printStackTrace();
+				streamExists = false;
+			}finally {
+				try {
+					stream.close();
+				}catch (Exception e) {}
+			}
+			
+			FullscreenFix.print("Could not load language files!");
+			FullscreenFix.print("Fabric API installed: " + fabricApi);
+			FullscreenFix.print("Resource Exists: " + resourceExists);
+			FullscreenFix.print("Stream Exists: " + streamExists);
+		}
 		
 		print(translations.size() + " Translation keys");
 	}
 	
-	private static void loadLanguage(String name) {
+	private static boolean loadLanguage(String name) {
 		InputStream stream = null;
 		
 		try {
@@ -301,15 +333,21 @@ public class FullscreenFix {
 				if(resource.isPresent()) {
 					stream = resource.get().getInputStream();
 				}
-			}else {
-				stream = FullscreenFix.class.getResourceAsStream("/assets/" + Global.MODID + "/lang/" + name + ".lang");
 			}
 			if(stream == null) {
-				return;
+				stream = FullscreenFix.class.getResourceAsStream("/assets/" + MODID + "/lang/" + name + ".lang");
 			}
-			ConfigUtil.loadConfig(stream, (key, value) -> translations.put(key, value), '=');	
+			if(stream == null) {
+				return false;
+			}
+			ConfigUtil.loadConfig(stream, (key, value) -> translations.put(key, value), '=');
+			return true;
 		}catch (Exception e) {
 			throw new RuntimeException("Loading language: " + name, e);
+		}finally {
+			try {
+				stream.close();
+			}catch (Exception e) {}
 		}
 	}
 	

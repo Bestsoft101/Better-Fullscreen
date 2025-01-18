@@ -16,7 +16,9 @@ import b100.fullscreenfix.Global;
 import b100.fullscreenfix.MonitorInfo;
 import b100.fullscreenfix.VideoMode;
 import b100.fullscreenfix.util.GLFWUtil;
+import b100.fullscreenfix.util.MacUtil;
 import b100.fullscreenfix.util.Win32Util;
+import net.minecraft.client.util.MacWindowUtil;
 import net.minecraft.client.util.MonitorTracker;
 import net.minecraft.client.util.Window;
 
@@ -162,7 +164,7 @@ public abstract class WindowMixin {
 		final Window window = (Window)(Object)this;
 		final long handle = getHandle();
 		
-		if(Global.OS_WINDOWS) {
+		if(Global.isWindows()) {
 			Win32Util.updateWindowState(window, windowPosX, windowPosY, windowWidth, windowHeight, windowMaximized);
 			FullscreenFix.windowNeedsUpdate = false;
 			return;
@@ -174,8 +176,12 @@ public abstract class WindowMixin {
 		if(fullscreen && fullscreenMode != null) {
 			FullscreenFix.print("Change to Fullscreen with custom resolution");
 			
+			if(Global.isMac()) {
+				MacUtil.toggleFullscreen(handle);
+			}
+			
 			MonitorInfo monitorInfo = new MonitorInfo(fullscreenMode.monitor);
-			glfwSetWindowMonitor(window.getHandle(), 
+			glfwSetWindowMonitor(handle, 
 					fullscreenMode.monitor,
 					monitorInfo.posX,
 					monitorInfo.posY,
@@ -183,6 +189,10 @@ public abstract class WindowMixin {
 					fullscreenMode.vidMode.height(),
 					fullscreenMode.vidMode.refreshRate()
 			);
+			
+			if(Global.isMac()) {
+				MacUtil.fixStyleMask(handle);
+			}
 		}else if(fullscreen && !FullscreenFix.isBorderlessEnabled()) {
 			FullscreenFix.print("Change to Fullscreen");
 			
