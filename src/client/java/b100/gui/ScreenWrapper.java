@@ -1,7 +1,5 @@
 package b100.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -45,9 +43,6 @@ public class ScreenWrapper extends Screen {
 			screenOpened = false;
 			screen.onScreenOpened();
 		}
-		
-		RenderSystem.enableBlend();
-		RenderSystem.disableDepthTest();
 		
 		screen.draw();
 	}

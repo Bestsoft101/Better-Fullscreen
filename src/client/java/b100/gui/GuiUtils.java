@@ -2,8 +2,6 @@ package b100.gui;
 
 import java.util.function.Function;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import b100.fullscreenfix.mixin.access.IScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -43,8 +41,6 @@ public class GuiUtils {
 	
 	public void drawString(String string, int x, int y, int color, boolean shadow) {
 		drawContext.drawText(textRenderer, string, x, y, color, shadow);
-		RenderSystem.enableBlend();
-		RenderSystem.disableDepthTest();
 	}
 	
 	public void drawString(Text text, int x, int y, int color, boolean shadow) {

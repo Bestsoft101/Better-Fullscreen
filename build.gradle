@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -48,12 +48,12 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	// Mod Menu
-	modImplementation("com.terraformersmc:modmenu:12.0.0-beta.1")
+	modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
 	
 	// Sodium
-    modImplementation("maven.modrinth:sodium:mc1.21.3-0.6.0-beta.4-fabric")
-    modImplementation("maven.modrinth:sodium-extra:mc1.21.3-0.6.0-beta.4+fabric")
-    modImplementation("maven.modrinth:reeses-sodium-options:mc1.21.3-1.8.0-beta.5+fabric")
+    modImplementation("maven.modrinth:sodium:mc1.21.5-0.6.11-fabric")
+    // modImplementation("maven.modrinth:sodium-extra:mc1.21.3-0.6.0-beta.4+fabric")
+    // modImplementation("maven.modrinth:reeses-sodium-options:mc1.21.3-1.8.0-beta.5+fabric")
 }
 
 processResources {
