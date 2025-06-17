@@ -1,6 +1,7 @@
 package b100.gui;
 
 import b100.gui.Textures.GuiTextures;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.util.math.MathHelper;
 
 public class GuiScrollableList extends GuiContainer {
@@ -34,9 +35,9 @@ public class GuiScrollableList extends GuiContainer {
 		
 		final int separatorSize = 2;
 		
-		utils.drawContext.drawTexture(utils.getRenderLayer, textures.menuListBackground, posX, posY + separatorSize, 0, 0, this.width, this.height - 2 * separatorSize, 32, 32);
-		utils.drawContext.drawTexture(utils.getRenderLayer, textures.headerSeparator, posX, posY, 0, 0, this.width, separatorSize, 32, separatorSize);
-		utils.drawContext.drawTexture(utils.getRenderLayer, textures.footerSeparator, posX, posY + this.height - separatorSize, 0, 0, this.width, 2, 32, separatorSize);
+		utils.drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, textures.menuListBackground, posX, posY + separatorSize, 0, 0, this.width, this.height - 2 * separatorSize, 32, 32);
+		utils.drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, textures.headerSeparator, posX, posY, 0, 0, this.width, separatorSize, 32, separatorSize);
+		utils.drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, textures.footerSeparator, posX, posY + this.height - separatorSize, 0, 0, this.width, 2, 32, separatorSize);
 		
 		utils.drawContext.enableScissor(posX, posY + separatorSize, posX + width, posY + height - separatorSize);
 		super.draw();

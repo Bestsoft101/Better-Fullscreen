@@ -1,13 +1,11 @@
 package b100.gui;
 
-import java.util.function.Function;
-
 import b100.fullscreenfix.mixin.access.IScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
@@ -20,8 +18,6 @@ public class GuiUtils {
 	
 	public DrawContext drawContext;
 	public TextRenderer textRenderer;
-	
-	public Function<Identifier, RenderLayer> getRenderLayer = (id) -> RenderLayer.getGuiTextured(id);
 	
 	private GuiUtils() {
 		
@@ -44,6 +40,9 @@ public class GuiUtils {
 	}
 	
 	public void drawString(Text text, int x, int y, int color, boolean shadow) {
+		if((color & 0xFF000000) == 0) {
+			color = color | 0xFF000000;
+		}
 		drawString(text.getString(), x, y, color, shadow);
 	}
 
@@ -53,7 +52,7 @@ public class GuiUtils {
 	}
 	
 	public void drawGuiTexture(Identifier texture, int x, int y, int width, int height) {
-		drawContext.drawGuiTexture(getRenderLayer, texture, x, y, width, height);
+		drawContext.drawGuiTexture(RenderPipelines.GUI_TEXTURED, texture, x, y, width, height);
 	}
 	
 	public void drawRectangle(int x, int y, int w, int h, int color) {

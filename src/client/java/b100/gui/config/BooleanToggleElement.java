@@ -51,7 +51,7 @@ public class BooleanToggleElement extends GuiContainer implements ActionListener
 			utils.drawRectangle(posX, posY, width, height, 0x20FFFFFF);
 			
 			if(tooltipText != null) {
-				screen.setTooltip(tooltipText);
+				screen.drawWrappedTooltip(tooltipText);
 			}
 		}
 		

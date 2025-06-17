@@ -48,7 +48,7 @@ public class CustomOptionElement<E> extends GuiContainer implements ActionListen
 			utils.drawRectangle(posX, posY, width, height, 0x20FFFFFF);
 			
 			if(tooltipText != null) {
-				screen.setTooltip(tooltipText);
+				screen.drawWrappedTooltip(tooltipText);
 			}
 		}
 		

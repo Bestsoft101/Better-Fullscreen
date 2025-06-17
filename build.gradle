@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -28,7 +28,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"modid" {
+		"template-mod" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -48,10 +48,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	// Mod Menu
-	modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
+	modImplementation("com.terraformersmc:modmenu:15.0.0-beta.1")
 	
 	// Sodium
-    modImplementation("maven.modrinth:sodium:mc1.21.5-0.6.11-fabric")
+    modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric")
     // modImplementation("maven.modrinth:sodium-extra:mc1.21.3-0.6.0-beta.4+fabric")
     // modImplementation("maven.modrinth:reeses-sodium-options:mc1.21.3-1.8.0-beta.5+fabric")
 }
@@ -60,7 +60,7 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
@@ -79,8 +79,10 @@ java {
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
 

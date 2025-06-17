@@ -25,8 +25,6 @@ public class ScreenWrapper extends Screen {
 		utils.drawContext = context;
 		utils.textRenderer = textRenderer;
 		
-		screen.setWrapper(this);
-		
 		screen.mouseX = mouseX;
 		screen.mouseY = mouseY;
 		

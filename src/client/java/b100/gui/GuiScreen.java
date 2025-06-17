@@ -4,6 +4,8 @@ import org.lwjgl.glfw.GLFW;
 
 import b100.fullscreenfix.FullscreenFix;
 import b100.fullscreenfix.mixin.access.IScreen;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
 
 public abstract class GuiScreen extends GuiContainer implements IScreen, FocusListener, ContainerListener {
@@ -23,16 +25,10 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	public final ListenerList<ScreenListener> screenListeners = new ListenerList<>(this);
 	public final ListenerList<FocusListener> focusListeners = new ListenerList<>(this);
 	
-	private ScreenWrapper wrapper;
-	
 	public GuiScreen(IScreen parentScreen) {
 		this.parentScreen = parentScreen;
 		
 		containerListeners.add(this);
-	}
-	
-	public void setWrapper(ScreenWrapper wrapper) {
-		this.wrapper = wrapper;
 	}
 	
 	public final void init() {
@@ -85,6 +81,14 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 		}
 		
 		return false;
+	}
+	
+	public void drawWrappedTooltip(Text text) {
+		utils.drawContext.drawTooltip(Tooltip.wrapLines(MinecraftClient.getInstance(), text), (int) mouseX, (int) mouseY);
+	}
+	
+	public void drawTooltip(Text text) {
+		utils.drawContext.drawTooltip(text, (int) mouseX, (int) mouseY);
 	}
 	
 	public boolean focusNextElement(FocusDirection direction) {
@@ -179,10 +183,6 @@ public abstract class GuiScreen extends GuiContainer implements IScreen, FocusLi
 	
 	public void onScreenOpened() {
 		screenListeners.forEach((listener) -> listener.onScreenOpened(this));
-	}
-	
-	public void setTooltip(Text tooltip) {
-		wrapper.setTooltip(tooltip);
 	}
 
 }
