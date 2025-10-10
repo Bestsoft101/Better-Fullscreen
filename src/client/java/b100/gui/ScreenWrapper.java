@@ -1,8 +1,10 @@
 package b100.gui;
 
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 
 public class ScreenWrapper extends Screen {
@@ -46,23 +48,23 @@ public class ScreenWrapper extends Screen {
 	}
 	
 	@Override
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return screen.keyEvent(keyCode, scanCode, modifiers, true);
+	public boolean keyPressed(KeyInput input) {
+		return screen.keyEvent(input.key(), input.scancode(), input.modifiers(), true);
 	}
 	
 	@Override
-	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-		return screen.keyEvent(keyCode, scanCode, modifiers, false);
+	public boolean keyReleased(KeyInput input) {
+		return screen.keyEvent(input.key(), input.scancode(), input.modifiers(), false);
 	}
 	
 	@Override
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return screen.mouseEvent(button, true, mouseX, mouseY);
+	public boolean mouseClicked(Click click, boolean doubled) {
+		return screen.mouseEvent(click.button(), true, click.x(), click.y());
 	}
 	
 	@Override
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		return screen.mouseEvent(button, false, mouseX, mouseY);
+	public boolean mouseReleased(Click click) {
+		return screen.mouseEvent(click.button(), false, click.x(), click.y());
 	}
 	
 	@Override

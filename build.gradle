@@ -48,10 +48,10 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	// Mod Menu
-	modImplementation("com.terraformersmc:modmenu:15.0.0-beta.1")
+	modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
 	
 	// Sodium
-    modImplementation("maven.modrinth:sodium:mc1.21.6-0.6.13-fabric")
+    modImplementation("maven.modrinth:sodium:mc1.21.10-0.7.2-fabric")
     // modImplementation("maven.modrinth:sodium-extra:mc1.21.3-0.6.0-beta.4+fabric")
     // modImplementation("maven.modrinth:reeses-sodium-options:mc1.21.3-1.8.0-beta.5+fabric")
 }
