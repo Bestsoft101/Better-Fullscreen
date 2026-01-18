@@ -1,11 +1,11 @@
 {
 	"schemaVersion": 1,
 	"id": "fullscreenfix",
-	"version": "${version}",
+	"version": "2.2.1",
 	"name": "Borderless Fullscreen",
-	"description": "Borderless Fullscreen",
+	"description": "This mod changes Minecraft's fullscreen mode and makes it more customizable. By default, it makes the game not minimize on lost focus, and allows other windows on top of the game.",
 	"authors": [
-		"Me!"
+		"Bestsoft100"
 	],
 	"contact": {
 		"homepage": "https://github.com/Bestsoft101/Better-Fullscreen",
