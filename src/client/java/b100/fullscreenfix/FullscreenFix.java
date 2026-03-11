@@ -168,6 +168,7 @@ public class FullscreenFix {
 								setFullscreenMode(getCurrentFullscreenMode().next());
 								pressedButton.setMessage(getFullscreenModeDisplayText());
 							}).build();
+							button.setX(x);
 							return button;
 						};
 					}

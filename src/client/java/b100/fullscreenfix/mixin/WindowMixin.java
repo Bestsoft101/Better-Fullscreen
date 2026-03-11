@@ -223,10 +223,10 @@ public abstract class WindowMixin {
 		glfwShowWindow(handle);
 		
 		FullscreenFix.windowNeedsUpdate = false;
-		GLFWUtil.updateCursorMode();
+//		GLFWUtil.updateCursorMode();
 	}
 	
-	@Inject(method = "setFullscreenVideoMode", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "setVideoMode", at = @At("HEAD"), cancellable = true)
 	private void onSetFullscreenVideoMode(Optional<net.minecraft.client.util.VideoMode> optional, CallbackInfo ci) {
 		FullscreenFix.print("Set Fullscreen Mode: " + optional);
 		

@@ -10,9 +10,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import b100.fullscreenfix.FullscreenFix;
 import b100.fullscreenfix.SodiumCompat;
-import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptionPages;
-import net.caffeinemc.mods.sodium.client.gui.options.Option;
-import net.caffeinemc.mods.sodium.client.gui.options.OptionGroup;
+import me.jellysquid.mods.sodium.client.gui.SodiumGameOptionPages;
+import me.jellysquid.mods.sodium.client.gui.options.Option;
+import me.jellysquid.mods.sodium.client.gui.options.OptionGroup;
 
 @Mixin(value = SodiumGameOptionPages.class, remap = false)
 public class SodiumGameOptionPagesMixin {
@@ -21,7 +21,7 @@ public class SodiumGameOptionPagesMixin {
 			method = "general",
 			at = @At(
 					value = "INVOKE", ordinal = 0,
-					target = "Lnet/caffeinemc/mods/sodium/client/gui/options/OptionGroup$Builder;add(Lnet/caffeinemc/mods/sodium/client/gui/options/Option;)Lnet/caffeinemc/mods/sodium/client/gui/options/OptionGroup$Builder;"
+					target = "Lme/jellysquid/mods/sodium/client/gui/options/OptionGroup$Builder;add(Lme/jellysquid/mods/sodium/client/gui/options/Option;)Lme/jellysquid/mods/sodium/client/gui/options/OptionGroup$Builder;"
 			),
 			slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=options.fullscreen"))
 	)
@@ -36,7 +36,7 @@ public class SodiumGameOptionPagesMixin {
 			method = "general",
 			at = @At(
 					value = "INVOKE", ordinal = 0,
-					target = "Lnet/caffeinemc/mods/sodium/client/gui/options/OptionGroup$Builder;add(Lnet/caffeinemc/mods/sodium/client/gui/options/Option;)Lnet/caffeinemc/mods/sodium/client/gui/options/OptionGroup$Builder;"
+					target = "Lme/jellysquid/mods/sodium/client/gui/options/OptionGroup$Builder;add(Lme/jellysquid/mods/sodium/client/gui/options/Option;)Lme/jellysquid/mods/sodium/client/gui/options/OptionGroup$Builder;"
 			),
 			slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=options.fullscreen.resolution"))
 	)

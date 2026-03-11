@@ -80,18 +80,19 @@ public class GLFWUtil {
 	}
 	
 	public static int getUpdatedCursorMode(int mode) {
-		if(mode == GLFW_CURSOR_NORMAL || mode == GLFW_CURSOR_CAPTURED) {
-			boolean isCaptured = mode == GLFW_CURSOR_CAPTURED;
-			boolean shouldBeCaptured = FullscreenFix.CAPTURE_CURSOR.getBoolean() && FullscreenFix.isFullscreenEnabled();
-			if(isCaptured != shouldBeCaptured) {
-				if(shouldBeCaptured) {
-					mode = GLFW_CURSOR_CAPTURED;
-				}else {
-					mode = GLFW_CURSOR_NORMAL;
-				}
-			}
-		}
-		return mode;
+//		if(mode == GLFW_CURSOR_NORMAL || mode == GLFW_CURSOR_CAPTURED) {
+//			boolean isCaptured = mode == GLFW_CURSOR_CAPTURED;
+//			boolean shouldBeCaptured = FullscreenFix.CAPTURE_CURSOR.getBoolean() && FullscreenFix.isFullscreenEnabled();
+//			if(isCaptured != shouldBeCaptured) {
+//				if(shouldBeCaptured) {
+//					mode = GLFW_CURSOR_CAPTURED;
+//				}else {
+//					mode = GLFW_CURSOR_NORMAL;
+//				}
+//			}
+//		}
+//		return mode;
+		return GLFW_CURSOR_NORMAL;
 	}
 	
 	public static void updateCursorMode() {
@@ -112,9 +113,10 @@ public class GLFWUtil {
 	}
 	
 	public static String getCursorModeString(int cursorMode) {
-		if(cursorMode == GLFW_CURSOR_CAPTURED) {
-			return "CAPTURED";
-		}else if(cursorMode == GLFW_CURSOR_NORMAL) {
+//		if(cursorMode == GLFW_CURSOR_CAPTURED) {
+//			return "CAPTURED";
+//		}else
+		if(cursorMode == GLFW_CURSOR_NORMAL) {
 			return "NORMAL";
 		}else if(cursorMode == GLFW_CURSOR_HIDDEN) {
 			return "HIDDEN";

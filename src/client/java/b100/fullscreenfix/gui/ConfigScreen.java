@@ -54,7 +54,7 @@ public class ConfigScreen extends GuiScrollListScreen {
 				scrollList.add(BooleanToggleElement.create(this, "option.windowsFullscreenOptimizations", FullscreenFix.FULLSCREEN_OPTIMIZATIONS, UpdateMode.ON_SAVE));
 			}
 
-			scrollList.add(BooleanToggleElement.create(this, "option.captureCursorInFullscreen", FullscreenFix.CAPTURE_CURSOR, UpdateMode.ON_SAVE));
+//			scrollList.add(BooleanToggleElement.create(this, "option.captureCursorInFullscreen", FullscreenFix.CAPTURE_CURSOR, UpdateMode.ON_SAVE));
 			scrollList.add(BooleanToggleElement.create(this, "option.autoMinimize", FullscreenFix.AUTO_MINIMIZE, UpdateMode.ON_SAVE));
 			scrollList.add(BooleanToggleElement.create(this, "option.startInFullscreen", FullscreenFix.START_IN_FULLSCREEN, UpdateMode.ON_SAVE));
 			

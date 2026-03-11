@@ -1,8 +1,8 @@
 package b100.fullscreenfix;
 
-import net.caffeinemc.mods.sodium.client.gui.options.OptionImpl;
-import net.caffeinemc.mods.sodium.client.gui.options.control.CyclingControl;
-import net.caffeinemc.mods.sodium.client.gui.options.storage.OptionStorage;
+import me.jellysquid.mods.sodium.client.gui.options.OptionImpl;
+import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;
+import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
 import net.minecraft.text.Text;
 
 public class SodiumCompat {
