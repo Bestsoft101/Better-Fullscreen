@@ -6,7 +6,7 @@
 	"client": [
 		"access.WindowAccess",
 		"InputUtilMixin",
-		"KeyboardMixin",
+		"MinecraftMixin",
 		"VideoOptionsScreenMixin",
 		"WindowMixin"
 	],

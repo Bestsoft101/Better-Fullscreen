@@ -4,7 +4,6 @@ import static b100.fullscreenfix.Global.INDEV;
 import static b100.fullscreenfix.Global.MODID;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.mojang.blaze3d.platform.Window;
@@ -23,6 +22,7 @@ import b100.lib.translate.Translations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.OptionInstance.TooltipSupplier;
+import net.minecraft.client.OptionInstance.ValueUpdateListener;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -112,7 +112,7 @@ public class FullscreenFix {
 	////////////////////////////////////
 	
 	public static void openConfigScreen() {
-		IScreen currentScreen = (IScreen) Minecraft.getInstance().screen;
+		IScreen currentScreen = (IScreen) Minecraft.getInstance().gui.screen();
 		if(!(currentScreen instanceof ConfigScreen)) {
 			GuiUtils.instance.setScreen(new ConfigScreen(null));	
 		}
@@ -152,7 +152,7 @@ public class FullscreenFix {
 				(text, value) -> Component.nullToEmpty("idkwhatthisdoes"),
 				new OptionInstance.ValueSet<>() {
 					@Override
-					public Function<OptionInstance<Integer>, AbstractWidget> createButton(TooltipSupplier<Integer> tooltipFactory, Options gameOptions, int x, int y, int width, Consumer<Integer> changeCallback) {
+					public Function<OptionInstance<Integer>, AbstractWidget> createButton(TooltipSupplier<Integer> tooltipFactory, Options gameOptions, int x, int y, int width, ValueUpdateListener<? super Integer> onValueChanged) {
 						return option -> {
 							final Button button = Button.builder(getFullscreenModeDisplayText(), (pressedButton) -> {
 								setFullscreenMode(getCurrentFullscreenMode().next());

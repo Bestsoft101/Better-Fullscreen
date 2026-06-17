@@ -7,7 +7,7 @@ import net.caffeinemc.mods.sodium.api.config.StorageEventHandler;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.EnumOptionBuilder;
 import net.caffeinemc.mods.sodium.api.config.structure.OptionBuilder;
-import net.caffeinemc.mods.sodium.client.gui.SodiumConfigBuilder.FullscreenMode;
+import net.caffeinemc.mods.sodium.client.gui.options.FullscreenMode;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
